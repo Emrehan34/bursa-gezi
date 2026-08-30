@@ -1,6 +1,6 @@
 /**
  * BURSA CANLI GPS, A'DAN B'YE GERÇEK YOL ROTASI & GÖRSEL ULAŞIM ZİNCİRİ
- * Kararlı, Gerçek Yol Ağı (OSRM) ve Akıllı Transit Aktarma Şeması
+ * Kararlı, Gerçek Yol Ağı (OSRM), Burulaş Canlı Filo Telemetrisi ve Akıllı Transit Asistanı
  */
 
 // 1. BURSA TÜM OTOBÜS & METRO HATLARI VERİTABANI
@@ -22,16 +22,9 @@ const BUS_LINES_DATA = [
             { name: "Gölyazı Köy Meydanı", lat: 40.1610, lng: 28.6775 }
         ],
         pathCoords: [
-            [40.2240, 28.8475],
-            [40.2200, 28.8300],
-            [40.2180, 28.8150],
-            [40.2100, 28.7900],
-            [40.2050, 28.7650],
-            [40.1950, 28.7400],
-            [40.1850, 28.7200],
-            [40.1750, 28.6950],
-            [40.1680, 28.6850],
-            [40.1610, 28.6775]
+            [40.2240, 28.8475], [40.2200, 28.8300], [40.2180, 28.8150], [40.2100, 28.7900],
+            [40.2050, 28.7650], [40.1950, 28.7400], [40.1850, 28.7200], [40.1750, 28.6950],
+            [40.1680, 28.6850], [40.1610, 28.6775]
         ]
     },
     {
@@ -51,14 +44,25 @@ const BUS_LINES_DATA = [
             { name: "Mudanya BUDO İskelesi & Kordon", lat: 40.3755, lng: 28.8830 }
         ],
         pathCoords: [
-            [40.2620, 28.9410],
-            [40.2780, 28.9320],
-            [40.2920, 28.9250],
-            [40.3050, 28.9180],
-            [40.3250, 28.9120],
-            [40.3450, 28.9050],
-            [40.3620, 28.8920],
-            [40.3755, 28.8830]
+            [40.2620, 28.9410], [40.2780, 28.9320], [40.2920, 28.9250], [40.3050, 28.9180],
+            [40.3250, 28.9120], [40.3450, 28.9050], [40.3620, 28.8920], [40.3755, 28.8830]
+        ]
+    },
+    {
+        id: "line-trilye",
+        code: "TRİLYE",
+        name: "Mudanya İskelesi ➔ Kumyaka ➔ Tarihi Trilye",
+        type: "Sahil Minibüsü",
+        color: "#ea580c",
+        frequency: "Her 15 dk",
+        firstLastTime: "06:30 - 22:30",
+        stops: [
+            { name: "Mudanya BUDO İskelesi", lat: 40.3755, lng: 28.8830 },
+            { name: "Kumyaka Sahili", lat: 40.3820, lng: 28.8350 },
+            { name: "Trilye Liman & Taş Mektep", lat: 40.3885, lng: 28.7950 }
+        ],
+        pathCoords: [
+            [40.3755, 28.8830], [40.3780, 28.8600], [40.3820, 28.8350], [40.3850, 28.8150], [40.3885, 28.7950]
         ]
     },
     {
@@ -78,16 +82,9 @@ const BUS_LINES_DATA = [
             { name: "Mudanya BUDO İskelesi", lat: 40.3755, lng: 28.8830 }
         ],
         pathCoords: [
-            [40.1680, 29.0880],
-            [40.1760, 29.0780],
-            [40.1810, 29.0700],
-            [40.1828, 29.0667],
-            [40.1855, 29.0595],
-            [40.1900, 29.0450],
-            [40.1940, 29.0250],
-            [40.2300, 28.9800],
-            [40.3000, 28.9200],
-            [40.3755, 28.8830]
+            [40.1680, 29.0880], [40.1760, 29.0780], [40.1810, 29.0700], [40.1828, 29.0667],
+            [40.1855, 29.0595], [40.1900, 29.0450], [40.1940, 29.0250], [40.2300, 28.9800],
+            [40.3000, 28.9200], [40.3755, 28.8830]
         ]
     },
     {
@@ -107,14 +104,8 @@ const BUS_LINES_DATA = [
             { name: "Çekirge Termal", lat: 40.1950, lng: 29.0220 }
         ],
         pathCoords: [
-            [40.1895, 29.0760],
-            [40.1850, 29.0710],
-            [40.1828, 29.0667],
-            [40.1834, 29.0614],
-            [40.1855, 29.0550],
-            [40.1880, 29.0490],
-            [40.1920, 29.0380],
-            [40.1950, 29.0220]
+            [40.1895, 29.0760], [40.1850, 29.0710], [40.1828, 29.0667], [40.1834, 29.0614],
+            [40.1855, 29.0550], [40.1880, 29.0490], [40.1920, 29.0380], [40.1950, 29.0220]
         ]
     },
     {
@@ -133,14 +124,8 @@ const BUS_LINES_DATA = [
             { name: "Heykel 1 Durağı", lat: 40.1828, lng: 29.0667 }
         ],
         pathCoords: [
-            [40.2580, 29.0535],
-            [40.2420, 29.0560],
-            [40.2300, 29.0570],
-            [40.2200, 29.0580],
-            [40.2050, 29.0585],
-            [40.1950, 29.0590],
-            [40.1855, 29.0595],
-            [40.1828, 29.0667]
+            [40.2580, 29.0535], [40.2420, 29.0560], [40.2300, 29.0570], [40.2200, 29.0580],
+            [40.2050, 29.0585], [40.1950, 29.0590], [40.1855, 29.0595], [40.1828, 29.0667]
         ]
     },
     {
@@ -159,14 +144,8 @@ const BUS_LINES_DATA = [
             { name: "Nefes Dağyenice Macera Parkı", lat: 40.1180, lng: 28.9160 }
         ],
         pathCoords: [
-            [40.2055, 29.0220],
-            [40.1980, 29.0050],
-            [40.1920, 28.9850],
-            [40.1830, 28.9770],
-            [40.1650, 28.9600],
-            [40.1500, 28.9500],
-            [40.1300, 28.9300],
-            [40.1180, 28.9160]
+            [40.2055, 29.0220], [40.1980, 29.0050], [40.1920, 28.9850], [40.1830, 28.9770],
+            [40.1650, 28.9600], [40.1500, 28.9500], [40.1300, 28.9300], [40.1180, 28.9160]
         ]
     },
     {
@@ -184,10 +163,24 @@ const BUS_LINES_DATA = [
             { name: "Cumalıkızık Tarihi Köy Meydanı", lat: 40.1747, lng: 29.1706 }
         ],
         pathCoords: [
-            [40.1870, 29.1650],
-            [40.1820, 29.1670],
-            [40.1770, 29.1690],
-            [40.1747, 29.1706]
+            [40.1870, 29.1650], [40.1820, 29.1670], [40.1770, 29.1690], [40.1747, 29.1706]
+        ]
+    },
+    {
+        id: "line-d19",
+        code: "D/19",
+        name: "Kestel Metro ➔ Saitabat Şelalesi",
+        type: "Köy Minibüsü",
+        color: "#0891b2",
+        frequency: "Her 25 dk",
+        firstLastTime: "07:30 - 19:30",
+        stops: [
+            { name: "Kestel Metro İstasyonu", lat: 40.1920, lng: 29.2150 },
+            { name: "Derekızık Köyü", lat: 40.1700, lng: 29.2350 },
+            { name: "Saitabat Şelalesi", lat: 40.1550, lng: 29.2510 }
+        ],
+        pathCoords: [
+            [40.1920, 29.2150], [40.1800, 29.2250], [40.1700, 29.2350], [40.1550, 29.2510]
         ]
     },
     {
@@ -207,14 +200,8 @@ const BUS_LINES_DATA = [
             { name: "Kocasu Rafting Parkuru Tesisi", lat: 39.9050, lng: 28.9950 }
         ],
         pathCoords: [
-            [40.2055, 29.0220],
-            [40.1700, 28.9800],
-            [40.1200, 28.9600],
-            [40.0600, 28.9700],
-            [40.0300, 28.9800],
-            [39.9500, 28.9800],
-            [39.9100, 28.9850],
-            [39.9050, 28.9950]
+            [40.2055, 29.0220], [40.1700, 28.9800], [40.1200, 28.9600], [40.0600, 28.9700],
+            [40.0300, 28.9800], [39.9500, 28.9800], [39.9100, 28.9850], [39.9050, 28.9950]
         ]
     },
     {
@@ -237,14 +224,8 @@ const BUS_LINES_DATA = [
             { name: "Arabayatağı", lat: 40.1920, lng: 29.1300 }
         ],
         pathCoords: [
-            [40.2620, 28.9410],
-            [40.2450, 28.9550],
-            [40.2300, 28.9800],
-            [40.2100, 29.0150],
-            [40.2055, 29.0220],
-            [40.1980, 29.0450],
-            [40.1855, 29.0595],
-            [40.1895, 29.0760],
+            [40.2620, 28.9410], [40.2450, 28.9550], [40.2300, 28.9800], [40.2100, 29.0150],
+            [40.2055, 29.0220], [40.1980, 29.0450], [40.1855, 29.0595], [40.1895, 29.0760],
             [40.1920, 29.1300]
         ]
     },
@@ -269,16 +250,9 @@ const BUS_LINES_DATA = [
             { name: "Kestel", lat: 40.1920, lng: 29.2150 }
         ],
         pathCoords: [
-            [40.2240, 28.8475],
-            [40.2180, 28.9350],
-            [40.2140, 28.9780],
-            [40.2100, 28.9950],
-            [40.2055, 29.0220],
-            [40.1980, 29.0450],
-            [40.1855, 29.0595],
-            [40.1880, 29.0820],
-            [40.1870, 29.1650],
-            [40.1920, 29.2150]
+            [40.2240, 28.8475], [40.2180, 28.9350], [40.2140, 28.9780], [40.2100, 28.9950],
+            [40.2055, 29.0220], [40.1980, 29.0450], [40.1855, 29.0595], [40.1880, 29.0820],
+            [40.1870, 29.1650], [40.1920, 29.2150]
         ]
     }
 ];
@@ -287,7 +261,7 @@ const BUS_LINES_DATA = [
 const PLACES_DATA = [
     {
         id: "place-golyazi",
-        name: "Gölyazı Köyü (Uluabat Gölü)",
+        name: "Gölyazı Köyü (Uluabat Gölü & Ağlayan Çınar)",
         category: "doga",
         categoryName: "Göl & Ada",
         icon: "🌅",
@@ -299,19 +273,18 @@ const PLACES_DATA = [
         boardingStation: "Üniversite Metro İstasyonu Çıkışı Peronları",
         dropoffStation: "Gölyazı Köy Meydanı (Ağlayan Çınar)",
         frequency: "Her 20 dakikada bir",
-        desc: "Göl üzerinde yüzen yarımada köyü, sandal turları, Ağlayan Çınar ve efsane gün batımı.",
+        desc: "Göl üzerinde yüzen yarımada köyü, sandal turları, Ağlayan Çınar ve efsane gün batımı manzarası.",
         transitChain: [
             { icon: "fa-person-walking", text: "2 dk Yürüme", color: "bg-slate-100 text-slate-700" },
             { icon: "fa-train-subway", badge: "M2 Metro", text: "BursaRay (18 dk)", color: "bg-blue-600 text-white" },
             { icon: "fa-bus", badge: "5/G Otobüs", text: "Gölyazı (22 dk)", color: "bg-emerald-600 text-white" },
-            { icon: "fa-person-walking", text: "1 dk Yürüme", color: "bg-slate-100 text-slate-700" },
             { icon: "fa-flag-checkered", text: "Gölyazı Meydanı", color: "bg-slate-900 text-amber-400 font-bold" }
         ],
         transit: "BursaRay M2 ile Üniversite İstasyonu'na gelin. Çıkıştaki 5/G otobüsüne binerek doğrudan Gölyazı Köy Meydanı'nda inin."
     },
     {
         id: "place-cumalikizik",
-        name: "Cumalıkızık Köyü (UNESCO)",
+        name: "Cumalıkızık Köyü (UNESCO Dünya Mirası)",
         category: "tarih",
         categoryName: "Tarihi Köy",
         icon: "🏘️",
@@ -323,7 +296,7 @@ const PLACES_DATA = [
         boardingStation: "Cumalıkızık / Değirmenönü Metro Durağı",
         dropoffStation: "Cumalıkızık Tarihi Köy Meydanı",
         frequency: "Her 10 dakikada bir",
-        desc: "700 yıllık Osmanlı köyü, rengarenk cumbalı evler, mavi kapılar ve serpme köy kahvaltısı.",
+        desc: "700 yıllık Osmanlı köyü, rengarenk cumbalı ahşap evler, taş sokaklar ve ünlü köy kahvaltısı.",
         transitChain: [
             { icon: "fa-person-walking", text: "2 dk Yürüme", color: "bg-slate-100 text-slate-700" },
             { icon: "fa-train-subway", badge: "M2 Metro", text: "Cumalıkızık İst. (14 dk)", color: "bg-blue-600 text-white" },
@@ -333,78 +306,8 @@ const PLACES_DATA = [
         transit: "BursaRay M2 metrosu ile Cumalıkızık durağında inin. İstasyon önünden kalkan D/10 minibüsüyle 5 dakikada köyün içindesiniz."
     },
     {
-        id: "place-orhaneli-rafting",
-        name: "Orhaneli Kocasu Rafting Parkuru",
-        category: "adrenalin",
-        categoryName: "Rafting & Kanyon",
-        icon: "🚣",
-        lat: 39.9050,
-        lng: 28.9950,
-        associatedLineId: "line-orhaneli",
-        busCode: "ORHANELİ MİNİBÜSÜ",
-        busColor: "#d97706",
-        boardingStation: "Acemler Aktarma İstasyonu Peronları",
-        dropoffStation: "Kocasu Rafting Parkuru Tesisleri",
-        frequency: "Her 30 dakikada bir",
-        desc: "Marmara'nın tek rafting parkuru! 8.5 km uzunluk, 12 rapid ve kanyon doğası.",
-        transitChain: [
-            { icon: "fa-person-walking", text: "3 dk Yürüme", color: "bg-slate-100 text-slate-700" },
-            { icon: "fa-train-subway", badge: "M1/M2", text: "Acemler İstasyonu (10 dk)", color: "bg-blue-600 text-white" },
-            { icon: "fa-van-shuttle", badge: "ORHANELİ", text: "İlçe Minibüsü (40 dk)", color: "bg-amber-600 text-white" },
-            { icon: "fa-flag-checkered", text: "Rafting Parkuru", color: "bg-slate-900 text-amber-400 font-bold" }
-        ],
-        transit: "BursaRay ile Acemler İstasyonu'na gelin. Dağ İlçeleri peronundan Orhaneli minibüsüne binip Rafting Parkuru durağında inin (40 dk)."
-    },
-    {
-        id: "place-nefes-dagyenice",
-        name: "Nefes Dağyenice Macera Parkı",
-        category: "adrenalin",
-        categoryName: "Macera Parkı",
-        icon: "🎢",
-        lat: 40.1180,
-        lng: 28.9160,
-        associatedLineId: "line-b20a",
-        busCode: "B/20-A",
-        busColor: "#15803d",
-        boardingStation: "Acemler İstasyonu Otobüs Peronları",
-        dropoffStation: "Dağyenice Nefes Park Durağı",
-        frequency: "Her 35 dakikada bir",
-        desc: "Göl üstü zipline, zip coaster, kano, SUP kürek, dev salıncak ve macera parkurları.",
-        transitChain: [
-            { icon: "fa-person-walking", text: "2 dk Yürüme", color: "bg-slate-100 text-slate-700" },
-            { icon: "fa-train-subway", badge: "M1/M2", text: "Acemler İstasyonu (10 dk)", color: "bg-blue-600 text-white" },
-            { icon: "fa-bus", badge: "B/20-A Otobüs", text: "Dağyenice (25 dk)", color: "bg-emerald-700 text-white" },
-            { icon: "fa-flag-checkered", text: "Nefes Dağyenice", color: "bg-slate-900 text-amber-400 font-bold" }
-        ],
-        transit: "Acemler İstasyonu'ndan B/20-A Dağyenice otobüsüne binin. Misi Köyü üzerinden geçerek doğrudan Dağyenice Parkı'na ulaştırır."
-    },
-    {
-        id: "place-tirilye",
-        name: "Tirilye (Zeytinbağı)",
-        category: "sahil",
-        categoryName: "Sahil Kasabası",
-        icon: "⚓",
-        lat: 40.3885,
-        lng: 28.7950,
-        associatedLineId: "line-1m",
-        busCode: "1/M + Tirilye Minibüsü",
-        busColor: "#0284c7",
-        boardingStation: "Emek Metro İstasyonu (1/M) ➔ Mudanya İskelesi",
-        dropoffStation: "Tirilye Liman Meydanı",
-        frequency: "Her 12 dakikada bir",
-        desc: "Tarihi Rum taş evleri, Taş Mektep, zeytinyağı ve deniz kenarı balık restoranları.",
-        transitChain: [
-            { icon: "fa-person-walking", text: "2 dk Yürüme", color: "bg-slate-100 text-slate-700" },
-            { icon: "fa-train-subway", badge: "M1 Metro", text: "Emek İstasyonu (16 dk)", color: "bg-rose-600 text-white" },
-            { icon: "fa-bus", badge: "1/M Otobüs", text: "Mudanya İskelesi (15 dk)", color: "bg-sky-600 text-white" },
-            { icon: "fa-van-shuttle", badge: "TİRİLYE", text: "Sahil Minibüsü (15 dk)", color: "bg-amber-600 text-white" },
-            { icon: "fa-flag-checkered", text: "Tirilye Limanı", color: "bg-slate-900 text-amber-400 font-bold" }
-        ],
-        transit: "Emek metrosundan 1/M ile Mudanya İskelesi'ne inin. İskele önünden kalkan Tirilye minibüsüyle 15 dakikada sahildesiniz."
-    },
-    {
         id: "place-mudanya-kordon",
-        name: "Mudanya Mütareke Evi & Kordon",
+        name: "Mudanya Mütareke Evi & Tarihi Kordon",
         category: "sahil",
         categoryName: "Sahil & Kordon",
         icon: "🌊",
@@ -416,7 +319,7 @@ const PLACES_DATA = [
         boardingStation: "Emek Metrosu (1/M) veya Heykel'den (F/3)",
         dropoffStation: "Mudanya BUDO İskelesi & Kordon",
         frequency: "Her 12 dakikada bir",
-        desc: "Geniş sahil kordonu, tarihi Mütareke Binası müzesi, dondurmacılar ve deniz esintisi.",
+        desc: "Geniş sahil kordonu, tarihi Mütareke Binası müzesi, dondurmacılar, balıkçılar ve deniz esintisi.",
         transitChain: [
             { icon: "fa-person-walking", text: "2 dk Yürüme", color: "bg-slate-100 text-slate-700" },
             { icon: "fa-train-subway", badge: "M1 Metro", text: "Emek İstasyonu (16 dk)", color: "bg-rose-600 text-white" },
@@ -426,15 +329,82 @@ const PLACES_DATA = [
         transit: "Emek İstasyonu'ndan 1/M veya Heykel 1 durağından doğrudan F/3 Hızlı Ekspres otobüsü ile Mudanya Kordon'a gelin."
     },
     {
+        id: "place-tirilye",
+        name: "Trilye (Zeytinbağı & Taş Mektep)",
+        category: "sahil",
+        categoryName: "Sahil Kasabası",
+        icon: "⚓",
+        lat: 40.3885,
+        lng: 28.7950,
+        associatedLineId: "line-trilye",
+        busCode: "1/M + Trilye Minibüsü",
+        busColor: "#ea580c",
+        boardingStation: "Mudanya BUDO İskelesi Önü",
+        dropoffStation: "Trilye Liman Meydanı",
+        frequency: "Her 15 dakikada bir",
+        desc: "Tarihi Rum taş evleri, asırlık Taş Mektep, zeytinyağı butikleri ve deniz kenarı restoranlar.",
+        transitChain: [
+            { icon: "fa-train-subway", badge: "M1 Metro", text: "Emek İstasyonu (16 dk)", color: "bg-rose-600 text-white" },
+            { icon: "fa-bus", badge: "1/M Otobüs", text: "Mudanya İskelesi (15 dk)", color: "bg-sky-600 text-white" },
+            { icon: "fa-van-shuttle", badge: "TRİLYE", text: "Sahil Minibüsü (15 dk)", color: "bg-amber-600 text-white" },
+            { icon: "fa-flag-checkered", text: "Trilye Limanı", color: "bg-slate-900 text-amber-400 font-bold" }
+        ],
+        transit: "Emek metrosundan 1/M ile Mudanya İskelesi'ne inin. İskele önünden kalkan Trilye minibüsüyle 15 dakikada sahildesiniz."
+    },
+    {
+        id: "place-orhaneli-rafting",
+        name: "Orhaneli Kocasu Çayı Rafting Parkuru",
+        category: "adrenalin",
+        categoryName: "Rafting & Kanyon",
+        icon: "🚣",
+        lat: 39.9050,
+        lng: 28.9950,
+        associatedLineId: "line-orhaneli",
+        busCode: "ORHANELİ MİNİBÜSÜ",
+        busColor: "#d97706",
+        boardingStation: "Acemler Aktarma İstasyonu Peronları",
+        dropoffStation: "Kocasu Rafting Parkuru Tesisleri",
+        frequency: "Her 30 dakikada bir",
+        desc: "Marmara'nın tek ve en uzun rafting parkuru! 8.5 km uzunluk, 12 rapid ve doğa kanyonu.",
+        transitChain: [
+            { icon: "fa-train-subway", badge: "M1/M2", text: "Acemler İstasyonu (10 dk)", color: "bg-blue-600 text-white" },
+            { icon: "fa-van-shuttle", badge: "ORHANELİ", text: "İlçe Minibüsü (40 dk)", color: "bg-amber-600 text-white" },
+            { icon: "fa-flag-checkered", text: "Rafting Parkuru", color: "bg-slate-900 text-amber-400 font-bold" }
+        ],
+        transit: "BursaRay ile Acemler İstasyonu'na gelin. Dağ İlçeleri peronundan Orhaneli minibüsüne binip Rafting Parkuru durağında inin (40 dk)."
+    },
+    {
+        id: "place-nefes-dagyenice",
+        name: "Nefes Dağyenice Macera Parkı & Gölet",
+        category: "adrenalin",
+        categoryName: "Macera Parkı",
+        icon: "🎢",
+        lat: 40.1180,
+        lng: 28.9160,
+        associatedLineId: "line-b20a",
+        busCode: "B/20-A",
+        busColor: "#15803d",
+        boardingStation: "Acemler İstasyonu Otobüs Peronları",
+        dropoffStation: "Dağyenice Nefes Park Durağı",
+        frequency: "Her 35 dakikada bir",
+        desc: "Göl üstü zipline, zip coaster, kano, SUP kürek, dev salıncak, glamping ve orman parkurları.",
+        transitChain: [
+            { icon: "fa-train-subway", badge: "M1/M2", text: "Acemler İstasyonu (10 dk)", color: "bg-blue-600 text-white" },
+            { icon: "fa-bus", badge: "B/20-A Otobüs", text: "Dağyenice (25 dk)", color: "bg-emerald-700 text-white" },
+            { icon: "fa-flag-checkered", text: "Nefes Dağyenice", color: "bg-slate-900 text-amber-400 font-bold" }
+        ],
+        transit: "Acemler İstasyonu'ndan B/20-A Dağyenice otobüsüne binin. Misi Köyü üzerinden geçerek doğrudan Dağyenice Parkı'na ulaştırır."
+    },
+    {
         id: "place-ulu-cami",
-        name: "Bursa Ulu Camii & Kapalı Çarşı",
+        name: "Bursa Ulu Camii & Tarihi Çarşılar",
         category: "tarih",
         categoryName: "Tarihi Cami",
         icon: "🕌",
         lat: 40.1834,
         lng: 29.0614,
         associatedLineId: "line-1a",
-        busCode: "1/A (veya T1 Tramvay)",
+        busCode: "1/A (veya Şehreküstü Metro)",
         busColor: "#2563eb",
         boardingStation: "Şehreküstü Metro / Demirtaşpaşa",
         dropoffStation: "Ulu Cami & Heykel 1 Durağı",
@@ -443,28 +413,26 @@ const PLACES_DATA = [
         transitChain: [
             { icon: "fa-person-walking", text: "3 dk Yürüme", color: "bg-slate-100 text-slate-700" },
             { icon: "fa-bus", badge: "1/A Otobüs", text: "Ulu Cami Durağı (8 dk)", color: "bg-blue-600 text-white" },
-            { icon: "fa-person-walking", text: "1 dk Yürüme", color: "bg-slate-100 text-slate-700" },
             { icon: "fa-flag-checkered", text: "Ulu Cami Girişi", color: "bg-slate-900 text-amber-400 font-bold" }
         ],
-        transit: "BursaRay Şehreküstü istasyonundan 3 dk yürüyüş veya 1/A otobüsü / T1 Tramvayı ile Ulu Cami durağı."
+        transit: "BursaRay Şehreküstü istasyonundan 3 dk yürüyüş veya 1/A otobüsü ile Ulu Cami durağı."
     },
     {
         id: "place-koza-han",
-        name: "Koza Han & Tarihi Avlu",
+        name: "Koza Han & Tarihi Avlu (Közde Kahve)",
         category: "tarih",
         categoryName: "Tarihi Han",
         icon: "☕",
         lat: 40.1842,
         lng: 29.0635,
         associatedLineId: "line-1a",
-        busCode: "1/A / 38 / T1",
+        busCode: "1/A / 38",
         busColor: "#2563eb",
         boardingStation: "Heykel 1 Durağı veya Şehreküstü Metrosu",
         dropoffStation: "Koza Han Kapalı Çarşı Girişi",
         frequency: "Her 8-10 dakikada bir",
-        desc: "1491 yapımı ipek hanı, asırlık çınarlar altında közde Türk kahvesi.",
+        desc: "1491 yapımı tarihi ipek hanı, asırlık çınarlar altında közde Türk kahvesi ve ipek şallar.",
         transitChain: [
-            { icon: "fa-person-walking", text: "2 dk Yürüme", color: "bg-slate-100 text-slate-700" },
             { icon: "fa-train-subway", badge: "M1/M2", text: "Şehreküstü Metrosu (6 dk)", color: "bg-blue-600 text-white" },
             { icon: "fa-person-walking", text: "3 dk Yürüme", color: "bg-slate-100 text-slate-700" },
             { icon: "fa-flag-checkered", text: "Koza Han Avlusu", color: "bg-slate-900 text-amber-400 font-bold" }
@@ -473,7 +441,7 @@ const PLACES_DATA = [
     },
     {
         id: "place-tophane",
-        name: "Tophane Saat Kulesi & Türbeler",
+        name: "Tophane Saat Kulesi & Osman Gazi Türbesi",
         category: "tarih",
         categoryName: "Seyir & Tarih",
         icon: "🕰️",
@@ -485,7 +453,7 @@ const PLACES_DATA = [
         boardingStation: "Şehreküstü İstasyonu",
         dropoffStation: "Tophane Park Girişi (Yürüyüş 5 dk)",
         frequency: "Her 6-10 dakikada bir",
-        desc: "Osman Gazi & Orhan Gazi türbeleri, 6 katlı saat kulesi ve panoramik şehir gün batımı.",
+        desc: "Osman Gazi & Orhan Gazi türbeleri, 6 katlı saat kulesi, ramazan topu ve panoramik Bursa manzarası.",
         transitChain: [
             { icon: "fa-train-subway", badge: "M1/M2", text: "Şehreküstü Metrosu", color: "bg-blue-600 text-white" },
             { icon: "fa-person-walking", text: "5 dk Merdiven Çıkış", color: "bg-slate-100 text-slate-700" },
@@ -494,8 +462,30 @@ const PLACES_DATA = [
         transit: "Şehreküstü metro çıkışından tarihi Tophane sur merdivenlerini çıkarak 5 dakikada ulaşın."
     },
     {
+        id: "place-yesil-turbe",
+        name: "Yeşil Cami & Yeşil Türbe",
+        category: "tarih",
+        categoryName: "Külliye & Türbe",
+        icon: "🏛️",
+        lat: 40.1815,
+        lng: 29.0750,
+        associatedLineId: "line-f3",
+        busCode: "F/3 / 1/A",
+        busColor: "#0d9488",
+        boardingStation: "Heykel 1 / Setbaşı",
+        dropoffStation: "Yeşil Durağı",
+        frequency: "Her 10 dakikada bir",
+        desc: "Bursa'nın simgesi turkuaz çinili Yeşil Türbe ve Çelebi Mehmed'in görkemli külliyesi.",
+        transitChain: [
+            { icon: "fa-bus", badge: "F/3", text: "Setbaşı Durağı (5 dk)", color: "bg-teal-600 text-white" },
+            { icon: "fa-person-walking", text: "3 dk Yürüme", color: "bg-slate-100 text-slate-700" },
+            { icon: "fa-flag-checkered", text: "Yeşil Türbe Meydanı", color: "bg-slate-900 text-amber-400 font-bold" }
+        ],
+        transit: "Setbaşı köprüsünü geçerek yürüyerek 5 dakikada veya Yeşil tabelalı otobüslerle ulaşın."
+    },
+    {
         id: "place-teleferik",
-        name: "Bursa Teleferik & Uludağ",
+        name: "Bursa Teleferik & Uludağ Zirve",
         category: "doga",
         categoryName: "Dağ & Teleferik",
         icon: "🚠",
@@ -507,58 +497,35 @@ const PLACES_DATA = [
         boardingStation: "Heykel / Setbaşı Durağı",
         dropoffStation: "Teferrüç Teleferik Alt İstasyonu",
         frequency: "Her 15-20 dakikada bir",
-        desc: "Dünyanın en uzun teleferik hattı (9 km), havadan Uludağ çam ormanları panoraması.",
+        desc: "Dünyanın en uzun teleferik hattı (9 km), havadan Uludağ çam ormanları panoraması ve kayak bölgesi.",
         transitChain: [
-            { icon: "fa-person-walking", text: "2 dk Yürüme", color: "bg-slate-100 text-slate-700" },
             { icon: "fa-bus", badge: "F/3 Otobüs", text: "Teferrüç İst. (12 dk)", color: "bg-teal-600 text-white" },
             { icon: "fa-cable-car", badge: "TELEFERİK", text: "Uludağ Zirve Hattı (22 dk)", color: "bg-indigo-600 text-white" },
-            { icon: "fa-flag-checkered", text: "Uludağ 2. Gelişim Bölgesi", color: "bg-slate-900 text-amber-400 font-bold" }
+            { icon: "fa-flag-checkered", text: "Uludağ Oteller Bölgesi", color: "bg-slate-900 text-amber-400 font-bold" }
         ],
         transit: "Heykel veya Setbaşı'ndan Teleferik tabelalı F/3, S/1 veya S/2 otobüslerine binip Teferrüç İstasyonunda inin."
     },
     {
-        id: "place-fsm",
-        name: "FSM Bulvarı & Trendy Kafeler",
-        category: "eglence",
-        categoryName: "Cadde & Kafe",
-        icon: "☕",
-        lat: 40.2140,
-        lng: 28.9780,
-        associatedLineId: "line-m2",
-        busCode: "M2 BURSA RAY METROSU",
-        busColor: "#2563eb",
-        boardingStation: "Herhangi bir BursaRay İstasyonu",
-        dropoffStation: "Fatih Sultan Mehmet (FSM) İstasyonu",
-        frequency: "Her 6 dakikada bir",
-        desc: "Bursa'nın en havalı caddesi; yüzlerce popüler kafe, 3. dalga kahveci ve canlı akşamlar.",
+        id: "place-saitabat",
+        name: "Saitabat Şelalesi & Kanyon",
+        category: "doga",
+        categoryName: "Şelale & Kanyon",
+        icon: "💧",
+        lat: 40.1550,
+        lng: 29.2510,
+        associatedLineId: "line-d19",
+        busCode: "D/19 Minibüsü",
+        busColor: "#0891b2",
+        boardingStation: "Kestel Metro İstasyonu",
+        dropoffStation: "Saitabat Şelale Girişi",
+        frequency: "Her 25 dakikada bir",
+        desc: "Gürül gürül akan kanyon şelalesi, köy kadınları derneği organik kahvaltısı ve alabalık tesisleri.",
         transitChain: [
-            { icon: "fa-train-subway", badge: "M2 Metro", text: "FSM İstasyonu (12 dk)", color: "bg-blue-600 text-white" },
-            { icon: "fa-person-walking", text: "1 dk Yürüme", color: "bg-slate-100 text-slate-700" },
-            { icon: "fa-flag-checkered", text: "FSM Kafe Caddesi", color: "bg-slate-900 text-amber-400 font-bold" }
+            { icon: "fa-train-subway", badge: "M2 Metro", text: "Kestel Son İstasyon (20 dk)", color: "bg-blue-600 text-white" },
+            { icon: "fa-van-shuttle", badge: "D/19 Minibüs", text: "Saitabat (15 dk)", color: "bg-cyan-600 text-white" },
+            { icon: "fa-flag-checkered", text: "Saitabat Şelalesi", color: "bg-slate-900 text-amber-400 font-bold" }
         ],
-        transit: "BursaRay M2 (Üniversite yönü) metrosuna binip doğrudan FSM İstasyonu'nda inin; cadde istasyonun hemen önündedir."
-    },
-    {
-        id: "place-downtown",
-        name: "HUPALUPA & Downtown Bursa",
-        category: "eglence",
-        categoryName: "Eğlence Parkı",
-        icon: "🎪",
-        lat: 40.2220,
-        lng: 29.0230,
-        associatedLineId: "line-m1",
-        busCode: "M1 Metro ➔ Paşaçiftliği",
-        busColor: "#dc2626",
-        boardingStation: "BursaRay M1 Hattı",
-        dropoffStation: "Paşaçiftliği Metro İstasyonu",
-        frequency: "Her 6 dakikada bir",
-        desc: "Devasa trambolin parkı, VR simülatörleri, çarpışan arabalar, bowling ve alışveriş caddesi.",
-        transitChain: [
-            { icon: "fa-train-subway", badge: "M1 Metro", text: "Paşaçiftliği İst. (8 dk)", color: "bg-rose-600 text-white" },
-            { icon: "fa-bus", badge: "B/44-B", text: "Downtown Servis (4 dk)", color: "bg-blue-600 text-white" },
-            { icon: "fa-flag-checkered", text: "Downtown AVM Kapısı", color: "bg-slate-900 text-amber-400 font-bold" }
-        ],
-        transit: "BursaRay M1 ile Paşaçiftliği durağında inin, 8 dakika yürüyüş veya B/44-B otobüsüyle Downtown AVM kapısına gelin."
+        transit: "BursaRay M2 ile son durak Kestel'e gelin. Çıkıştaki D/19 minibüsü doğrudan şelale kapısına götürür."
     },
     {
         id: "place-suuctu",
@@ -574,14 +541,100 @@ const PLACES_DATA = [
         boardingStation: "Bursa Şehirlerarası Otobüs Terminali",
         dropoffStation: "Mustafakemalpaşa İlçe Garajı ➔ Suuçtu",
         frequency: "Her 30 dakikada bir",
-        desc: "38 metre yükseklikten dökülen dev şelale ve doğa yürüyüş parkuru.",
+        desc: "38 metre yükseklikten dökülen dev şelale, kayın ağaçları ve doğa yürüyüş parkurları.",
         transitChain: [
             { icon: "fa-bus", badge: "38 Otobüs", text: "Bursa Terminali (18 dk)", color: "bg-purple-600 text-white" },
             { icon: "fa-van-shuttle", badge: "M.K.PAŞA", text: "İlçe Minibüsü (45 dk)", color: "bg-amber-600 text-white" },
-            { icon: "fa-taxi", badge: "Şelale Dolmuşu", text: "Suuçtu (15 dk)", color: "bg-emerald-700 text-white" },
             { icon: "fa-flag-checkered", text: "Suuçtu Şelalesi", color: "bg-slate-900 text-amber-400 font-bold" }
         ],
-        transit: "Bursa Terminali'nden Mustafakemalpaşa minibüslerine binin, ilçe merkezinden Suuçtu servislerine geçin."
+        transit: "Bursa Terminali'nden Mustafakemalpaşa minibüslerine binin, ilçe merkezinden Suuçtu dolmuşlarına geçin."
+    },
+    {
+        id: "place-fsm",
+        name: "FSM Bulvarı (Kafeler & Gece Hayatı)",
+        category: "eglence",
+        categoryName: "Cadde & Kafe",
+        icon: "☕",
+        lat: 40.2140,
+        lng: 28.9780,
+        associatedLineId: "line-m2",
+        busCode: "M2 BURSA RAY METROSU",
+        busColor: "#2563eb",
+        boardingStation: "Herhangi bir BursaRay İstasyonu",
+        dropoffStation: "Fatih Sultan Mehmet (FSM) İstasyonu",
+        frequency: "Her 6 dakikada bir",
+        desc: "Bursa'nın en popüler bulvarı; yüzlerce ünlü kafe, gurme restoran ve 3. dalga kahveciler.",
+        transitChain: [
+            { icon: "fa-train-subway", badge: "M2 Metro", text: "FSM İstasyonu (12 dk)", color: "bg-blue-600 text-white" },
+            { icon: "fa-flag-checkered", text: "FSM Kafe Caddesi", color: "bg-slate-900 text-amber-400 font-bold" }
+        ],
+        transit: "BursaRay M2 (Üniversite yönü) metrosuna binip doğrudan FSM İstasyonu'nda inin."
+    },
+    {
+        id: "place-downtown",
+        name: "Downtown Bursa & HUPALUPA",
+        category: "eglence",
+        categoryName: "Eğlence & AVM",
+        icon: "🎪",
+        lat: 40.2220,
+        lng: 29.0230,
+        associatedLineId: "line-m1",
+        busCode: "M1 Metro ➔ Paşaçiftliği",
+        busColor: "#dc2626",
+        boardingStation: "BursaRay M1 Hattı",
+        dropoffStation: "Paşaçiftliği Metro İstasyonu",
+        frequency: "Her 6 dakikada bir",
+        desc: "Devasa kapalı tema parkı Hupalupa, gösteri havuzu, lüks açık hava caddesi ve restoranlar.",
+        transitChain: [
+            { icon: "fa-train-subway", badge: "M1 Metro", text: "Paşaçiftliği İst. (8 dk)", color: "bg-rose-600 text-white" },
+            { icon: "fa-person-walking", text: "5 dk Yürüyüş", color: "bg-slate-100 text-slate-700" },
+            { icon: "fa-flag-checkered", text: "Downtown AVM", color: "bg-slate-900 text-amber-400 font-bold" }
+        ],
+        transit: "BursaRay M1 ile Paşaçiftliği durağında inin, 5 dakika yürüyüşle Downtown kapısına ulaşın."
+    },
+    {
+        id: "place-iskender-tarihi",
+        name: "Tarihi Kebapçı İskender (Mavi Dükkan)",
+        category: "lezzet",
+        categoryName: "Gastronomi",
+        icon: "🥩",
+        lat: 40.1838,
+        lng: 29.0645,
+        associatedLineId: "line-1a",
+        busCode: "1/A / 38",
+        busColor: "#2563eb",
+        boardingStation: "Heykel 1 Durağı",
+        dropoffStation: "Tayyare Kültür Merkezi Yanı",
+        frequency: "Her 8 dakikada bir",
+        desc: "1867'den beri hakiki tereyağlı Bursa İskender Kebabı'nın doğduğu tarihi ahşap dükkan.",
+        transitChain: [
+            { icon: "fa-train-subway", badge: "M1/M2", text: "Şehreküstü İst. (6 dk)", color: "bg-blue-600 text-white" },
+            { icon: "fa-person-walking", text: "3 dk Yürüme", color: "bg-slate-100 text-slate-700" },
+            { icon: "fa-flag-checkered", text: "Tarihi İskender Dükkanı", color: "bg-slate-900 text-amber-400 font-bold" }
+        ],
+        transit: "Heykel Atatürk Anıtı'nın hemen arkasında, Tayyare Kültür Merkezi bitişiğinde yer alır."
+    },
+    {
+        id: "place-kayhan-kofte",
+        name: "Tarihi Kayhan Çarşısı (Pideli Köfte)",
+        category: "lezzet",
+        categoryName: "Gastronomi",
+        icon: "🥘",
+        lat: 40.1865,
+        lng: 29.0685,
+        associatedLineId: "line-1a",
+        busCode: "1/A (Demirtaşpaşa)",
+        busColor: "#2563eb",
+        boardingStation: "Demirtaşpaşa Metro İstasyonu",
+        dropoffStation: "Kayhan Çarşısı Girişi",
+        frequency: "Her 10 dakikada bir",
+        desc: "Kızgın tereyağı, kemik suyuyla ıslatılmış tırnak pide ve köftenin buluştuğu otantik lezzet sokağı.",
+        transitChain: [
+            { icon: "fa-train-subway", badge: "M1/M2", text: "Demirtaşpaşa İst. (5 dk)", color: "bg-blue-600 text-white" },
+            { icon: "fa-person-walking", text: "2 dk Yürüme", color: "bg-slate-100 text-slate-700" },
+            { icon: "fa-flag-checkered", text: "Kayhan Çarşısı", color: "bg-slate-900 text-amber-400 font-bold" }
+        ],
+        transit: "Demirtaşpaşa metro durağında inin, 2 dakika yürüyerek Kayhan Çarşısı tabelasından girin."
     }
 ];
 
