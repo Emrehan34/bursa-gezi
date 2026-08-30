@@ -144,9 +144,47 @@
             from { transform: translateY(100%); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
+        /* DARK MODE STYLES */
+        body.dark-mode {
+            background-color: #030712 !important;
+            color: #f1f5f9 !important;
+        }
+        body.dark-mode aside {
+            background-color: #090d16 !important;
+            border-color: #1e293b !important;
+            color: #f1f5f9 !important;
+        }
+        body.dark-mode .bg-white {
+            background-color: #0f172a !important;
+            border-color: #1e293b !important;
+            color: #f1f5f9 !important;
+        }
+        body.dark-mode .bg-slate-50, body.dark-mode .bg-slate-100 {
+            background-color: #0b0f19 !important;
+            border-color: #1e293b !important;
+        }
+        body.dark-mode .text-slate-800, body.dark-mode .text-slate-900 {
+            color: #f8fafc !important;
+        }
+        body.dark-mode .text-slate-600, body.dark-mode .text-slate-500 {
+            color: #94a3b8 !important;
+        }
+        body.dark-mode select, body.dark-mode input {
+            background-color: #1e293b !important;
+            color: #ffffff !important;
+            border-color: #334155 !important;
+        }
+        body.dark-mode .border-slate-200, body.dark-mode .border-slate-300 {
+            border-color: #1e293b !important;
+        }
+        body.dark-mode #floating-place-card {
+            background-color: rgba(15, 23, 42, 0.95) !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 h-screen h-[100dvh] flex flex-col overflow-hidden">
+<body class="bg-slate-100 text-slate-800 h-screen h-[100dvh] flex flex-col overflow-hidden transition-colors duration-300">
 
     <!-- Top Navigation Header -->
     <header class="bg-slate-950 text-white shadow-2xl z-30 flex-none border-b border-slate-800 px-4 py-2.5">
@@ -166,8 +204,13 @@
                 </div>
             </div>
 
-            <!-- GPS Control & Quick Centers -->
+            <!-- GPS Control, Dark Mode & Quick Centers -->
             <div class="flex items-center space-x-2">
+                <!-- Dark Mode Toggle Button -->
+                <button onclick="toggleDarkMode()" id="btn-dark-mode" title="Gece / Gündüz Teması" class="bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 w-8 h-8 rounded-xl flex items-center justify-center transition active:scale-95 text-xs shadow-sm">
+                    <i id="dark-mode-icon" class="fa-solid fa-moon"></i>
+                </button>
+
                 <button onclick="requestRealGPS()" id="btn-real-gps" class="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-md transition transform active:scale-95">
                     <i id="gps-status-icon" class="fa-solid fa-location-crosshairs"></i>
                     <span id="gps-status-label" class="hidden sm:inline">Konumumu Bul</span>

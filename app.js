@@ -685,10 +685,54 @@ function renderEmptyRoutePrompt() {
     `;
 }
 
+let currentTileLayer = null;
+let isDarkMode = localStorage.getItem('bursa_gezi_theme') === 'dark';
+
+function applyMapTheme() {
+    if (!map) return;
+    if (currentTileLayer) map.removeLayer(currentTileLayer);
+
+    const isDark = document.body.classList.contains('dark-mode');
+    const tileUrl = isDark 
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+        : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+    currentTileLayer = L.tileLayer(tileUrl, {
+        attribution: '&copy; OpenStreetMap & Burulaş Akıllı Ulaşım',
+        maxZoom: 19,
+        subdomains: ['a', 'b', 'c', 'd']
+    }).addTo(map);
+}
+
+function toggleDarkMode() {
+    isDarkMode = !isDarkMode;
+    const body = document.body;
+    const icon = document.getElementById("dark-mode-icon");
+
+    if (isDarkMode) {
+        body.classList.add("dark-mode");
+        if (icon) icon.className = "fa-solid fa-sun text-amber-400";
+        localStorage.setItem('bursa_gezi_theme', 'dark');
+        showToastNotification("🌙 Gece Karanlık Modu Aktif", "info");
+    } else {
+        body.classList.remove("dark-mode");
+        if (icon) icon.className = "fa-solid fa-moon text-amber-300";
+        localStorage.setItem('bursa_gezi_theme', 'light');
+        showToastNotification("☀️ Gündüz Aydınlık Modu Aktif", "info");
+    }
+    applyMapTheme();
+}
+
 function initLeafletMap() {
     if (map) return;
     const mapEl = document.getElementById('map');
     if (!mapEl) return;
+
+    if (isDarkMode) {
+        document.body.classList.add('dark-mode');
+        const icon = document.getElementById("dark-mode-icon");
+        if (icon) icon.className = "fa-solid fa-sun text-amber-400";
+    }
 
     map = L.map('map', { 
         zoomControl: false,
@@ -697,11 +741,7 @@ function initLeafletMap() {
     
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap & Burulaş Akıllı Ulaşım',
-        maxZoom: 19,
-        subdomains: ['a', 'b', 'c']
-    }).addTo(map);
+    applyMapTheme();
 
     activeLineLayerGroup = L.layerGroup().addTo(map);
     activeRouteLayerGroup = L.layerGroup().addTo(map);
