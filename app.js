@@ -1392,24 +1392,29 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     return (R * c);
 }
 
-// 9. CANLI OTOBÜS ARAÇLARI SİMÜLASYONU
+// 9. CANLI OTOBÜS ARAÇLARI FİLO TELEMETRİSİ
 function initSimulatedVehicles() {
     simulatedVehicles = [
-        { id: "veh-line-5g", lineId: "line-5g", code: "5/G", color: "#16a34a", pathIndex: 0, progress: 0.1, speed: 42, etaSec: 135, lat: 40.2180, lng: 28.8150 },
-        { id: "veh-line-1m", lineId: "line-1m", code: "1/M", color: "#0284c7", pathIndex: 1, progress: 0.3, speed: 50, etaSec: 210, lat: 40.2920, lng: 28.9250 },
-        { id: "veh-line-1a", lineId: "line-1a", code: "1/A", color: "#2563eb", pathIndex: 2, progress: 0.5, speed: 35, etaSec: 85, lat: 40.1850, lng: 29.0600 },
-        { id: "veh-line-38", lineId: "line-38", code: "38", color: "#7c3aed", pathIndex: 1, progress: 0.4, speed: 48, etaSec: 260, lat: 40.2300, lng: 29.0570 }
+        { id: "veh-line-5g", lineId: "line-5g", code: "5/G", plate: "16 M 0482", color: "#16a34a", pathIndex: 0, progress: 0.1, speed: 42, occupancy: "%45", etaSec: 135, lat: 40.2180, lng: 28.8150 },
+        { id: "veh-line-1m", lineId: "line-1m", code: "1/M", plate: "16 BOI 92", color: "#0284c7", pathIndex: 1, progress: 0.3, speed: 52, occupancy: "%60", etaSec: 210, lat: 40.2920, lng: 28.9250 },
+        { id: "veh-line-1a", lineId: "line-1a", code: "1/A", plate: "16 M 3312", color: "#2563eb", pathIndex: 2, progress: 0.5, speed: 34, occupancy: "%30", etaSec: 85, lat: 40.1850, lng: 29.0600 },
+        { id: "veh-line-38", lineId: "line-38", code: "38", plate: "16 BOI 41", color: "#7c3aed", pathIndex: 1, progress: 0.4, speed: 48, occupancy: "%75", etaSec: 260, lat: 40.2300, lng: 29.0570 },
+        { id: "veh-line-b20a", lineId: "line-b20a", code: "B/20-A", plate: "16 M 2280", color: "#15803d", pathIndex: 1, progress: 0.2, speed: 38, occupancy: "%40", etaSec: 180, lat: 40.1830, lng: 28.9770 },
+        { id: "veh-line-d10", lineId: "line-d10", code: "D/10", plate: "16 M 0815", color: "#9333ea", pathIndex: 0, progress: 0.6, speed: 28, occupancy: "%50", etaSec: 90, lat: 40.1820, lng: 29.1670 },
+        { id: "veh-line-m1", lineId: "line-m1", code: "M1", plate: "Tren #104", color: "#dc2626", pathIndex: 2, progress: 0.7, speed: 65, occupancy: "%80", etaSec: 60, lat: 40.2055, lng: 29.0220 },
+        { id: "veh-line-m2", lineId: "line-m2", code: "M2", plate: "Tren #208", color: "#059669", pathIndex: 3, progress: 0.4, speed: 60, occupancy: "%70", etaSec: 110, lat: 40.2115, lng: 28.9830 }
     ];
 
     simulatedVehicles.forEach(v => {
         const busIcon = L.divIcon({
             className: 'live-bus-vehicle',
-            html: `<div style="background-color: ${v.color};" class="px-2 py-1 rounded-xl text-white font-mono font-black text-[11px] shadow-2xl border-2 border-white flex items-center gap-1 cursor-pointer hover:scale-125 transition"><i class="fa-solid fa-bus text-[10px]"></i> ${v.code}</div>`,
+            html: `<div style="background-color: ${v.color};" class="px-2 py-1 rounded-xl text-white font-mono font-black text-[11px] shadow-2xl border-2 border-white flex items-center gap-1 cursor-pointer hover:scale-125 transition active:scale-95"><i class="fa-solid fa-bus text-[10px]"></i> ${v.code}</div>`,
             iconSize: [46, 24],
             iconAnchor: [23, 12]
         });
 
         v.marker = L.marker([v.lat, v.lng], { icon: busIcon, zIndexOffset: 800 }).addTo(map);
+        v.marker.bindTooltip(`<b>🚌 Hat: ${v.code}</b><br><span class="text-[10px] text-slate-400">Plaka: ${v.plate} • Hız: ${v.speed} km/s</span>`);
         v.marker.on('click', () => {
             showBusLineOnMap(v.lineId);
         });
@@ -1418,9 +1423,9 @@ function initSimulatedVehicles() {
     setInterval(() => {
         simulatedVehicles.forEach(v => {
             const line = BUS_LINES_DATA.find(l => l.id === v.lineId);
-            if (!line) return;
+            if (!line || !line.pathCoords || line.pathCoords.length < 2) return;
 
-            v.progress += 0.04;
+            v.progress += 0.035;
             if (v.progress >= 1.0) {
                 v.progress = 0;
                 v.pathIndex = (v.pathIndex + 1) % (line.pathCoords.length - 1);
@@ -1428,12 +1433,95 @@ function initSimulatedVehicles() {
 
             const p1 = line.pathCoords[v.pathIndex];
             const p2 = line.pathCoords[v.pathIndex + 1];
+            if (!p1 || !p2) return;
 
             v.lat = p1[0] + (p2[0] - p1[0]) * v.progress;
             v.lng = p1[1] + (p2[1] - p1[1]) * v.progress;
             v.marker.setLatLng([v.lat, v.lng]);
         });
-    }, 1200);
+    }, 1000);
+}
+
+function showBusLineOnMap(lineId, focus = true) {
+    const line = BUS_LINES_DATA.find(l => l.id === lineId);
+    if (!line) return;
+
+    activeLineLayerGroup.clearLayers();
+
+    // 1. Draw stops with distinct numbered icons
+    line.stops.forEach((st, idx) => {
+        const icon = L.divIcon({
+            className: 'line-stop-icon',
+            html: `<div style="background-color: ${line.color};" class="w-7 h-7 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-[11px] font-black font-mono">${idx + 1}</div>`,
+            iconSize: [28, 28],
+            iconAnchor: [14, 14]
+        });
+        L.marker([st.lat, st.lng], { icon })
+            .addTo(activeLineLayerGroup)
+            .bindTooltip(`<b>${idx + 1}. Durak: ${st.name}</b><br><span class="text-[10px] text-slate-500 font-mono">Hat: ${line.code}</span>`);
+    });
+
+    // 2. Fetch True Street-Snapped Road Polyline from OSRM via waypoints!
+    const coordsParam = line.stops.map(s => `${s.lng},${s.lat}`).join(';');
+    const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${coordsParam}?overview=full&geometries=geojson`;
+
+    // Immediate fallback polyline
+    const tempPolyline = L.polyline(line.pathCoords, {
+        color: line.color,
+        weight: 6,
+        opacity: 0.85,
+        lineCap: 'round',
+        lineJoin: 'round'
+    }).addTo(activeLineLayerGroup);
+
+    if (focus) {
+        map.fitBounds(tempPolyline.getBounds(), { padding: [50, 50] });
+    }
+
+    fetch(osrmUrl)
+        .then(res => res.json())
+        .then(data => {
+            if (data.routes && data.routes.length > 0) {
+                const roadCoords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+                activeLineLayerGroup.removeLayer(tempPolyline);
+                
+                const realRoadPolyline = L.polyline(roadCoords, {
+                    color: line.color,
+                    weight: 7,
+                    opacity: 0.95,
+                    lineCap: 'round',
+                    lineJoin: 'round'
+                }).addTo(activeLineLayerGroup);
+
+                if (focus) {
+                    map.fitBounds(realRoadPolyline.getBounds(), { padding: [50, 50] });
+                }
+            }
+        })
+        .catch(() => {
+            // Keep fallback
+        });
+
+    openBusLiveCockpit(line);
+}
+
+function openBusLiveCockpit(line) {
+    const cockpit = document.getElementById("bus-live-cockpit");
+    document.getElementById("cockpit-badge").textContent = line.code;
+    document.getElementById("cockpit-badge").style.backgroundColor = line.color;
+    document.getElementById("cockpit-title").textContent = line.name;
+    document.getElementById("cockpit-stop-count").textContent = `Toplam ${line.stops.length} Durak`;
+
+    const timeline = document.getElementById("cockpit-stops-timeline");
+    timeline.innerHTML = "";
+    line.stops.forEach((st, i) => {
+        const itm = document.createElement("span");
+        itm.className = "bg-slate-900 border border-slate-800 px-2 py-1 rounded whitespace-nowrap text-[10px]";
+        itm.innerHTML = `<b class="text-blue-400">${i + 1}.</b> ${st.name}`;
+        timeline.appendChild(itm);
+    });
+
+    cockpit.classList.remove("hidden");
 }
 
 function showBusLineOnMap(lineId, focus = true) {
