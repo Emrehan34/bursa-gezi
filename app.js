@@ -1187,44 +1187,56 @@ function updateRouteLiveCountdownDOM() {
     }
 }
 
-// 8. GERÇEK YÜKSEK HASSASİYETLİ MOBİL GPS MOTORU
+// 8. GERÇEK YÜKSEK HASSASİYETLİ MOBİL GPS MOTORU (AKILLI HATA YÖNETİMİ)
+let gpsFirstCenterDone = false;
+
 function requestRealGPS(forceCenter = true) {
     const icon = document.getElementById("gps-status-icon");
     const label = document.getElementById("gps-status-label");
     if (icon) icon.className = "fa-solid fa-satellite-dish fa-spin text-amber-300";
-    if (label) label.textContent = "GPS Alınıyor...";
+    if (label) label.textContent = "GPS Taranıyor...";
 
-    if ("geolocation" in navigator) {
-        if (gpsWatchId !== null) {
-            navigator.geolocation.clearWatch(gpsWatchId);
-            gpsWatchId = null;
-        }
-
-        // 1. Direct High-Accuracy Hardware GPS
-        navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                handleGPSPositionSuccess(pos, forceCenter);
-            },
-            (err) => {
-                console.warn("GPS Hatası:", err.code, err.message);
-                handleGPSError(err);
-            },
-            { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
-        );
-
-        // 2. Continuous Real-Time Tracking
-        gpsWatchId = navigator.geolocation.watchPosition(
-            (pos) => {
-                handleGPSPositionSuccess(pos, false);
-            },
-            (err) => {
-                console.warn("GPS Watch:", err.message);
-            },
-            { enableHighAccuracy: true, timeout: 25000, maximumAge: 0 }
-        );
-    } else {
-        showToastNotification("Cihazınızda GPS desteği bulunamadı.", "error");
+    if (!("geolocation" in navigator)) {
+        showToastNotification("Cihazınızda GPS desteği bulunamadı.", "warning");
+        return;
     }
+
+    if (gpsWatchId !== null) {
+        navigator.geolocation.clearWatch(gpsWatchId);
+        gpsWatchId = null;
+    }
+
+    // 1. Aşama: Hızlı / Önbellekli Ağ Konumu (Beklemeden anında başlangıç)
+    navigator.geolocation.getCurrentPosition(
+        (pos) => {
+            handleGPSPositionSuccess(pos, forceCenter && !gpsFirstCenterDone);
+        },
+        (err) => {
+            console.log("Ön konum:", err.message);
+        },
+        { enableHighAccuracy: false, timeout: 5000, maximumAge: 60000 }
+    );
+
+    // 2. Aşama: Canlı GNSS Uydu Donanım Takibi
+    gpsWatchId = navigator.geolocation.watchPosition(
+        (pos) => {
+            handleGPSPositionSuccess(pos, forceCenter && !gpsFirstCenterDone);
+            gpsFirstCenterDone = true;
+        },
+        (err) => {
+            console.warn("GPS Hatası:", err.code, err.message);
+            // SADECE kullanıcı gerçekten 'Engelle / Reddet' dediyse izin uyarısı ver
+            if (err.code === 1) { // PERMISSION_DENIED
+                if (icon) icon.className = "fa-solid fa-location-crosshairs text-slate-400";
+                if (label) label.textContent = "Konum İzni Ver";
+                showToastNotification("⚠️ Konum izni verilmedi. Tarayıcı kilit simgesinden izin verebilirsiniz.", "warning");
+            } else if (err.code === 2 || err.code === 3) {
+                // İzin verilmiş ancak bina içinde veya uydu arıyor; ASLA "izin verilmedi" deme!
+                if (label) label.textContent = "Uydu Aranıyor...";
+            }
+        },
+        { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 }
+    );
 }
 
 function handleGPSPositionSuccess(pos, centerMap = true) {
@@ -1233,7 +1245,6 @@ function handleGPSPositionSuccess(pos, centerMap = true) {
     userCoords.accuracy = Math.round(pos.coords.accuracy || 5);
     userCoords.isRealGPS = true;
 
-    // Update Marker and Accuracy Circle
     updateUserMarker();
 
     if (centerMap && map) {
@@ -1241,8 +1252,6 @@ function handleGPSPositionSuccess(pos, centerMap = true) {
     }
 
     reverseGeocode(userCoords.lat, userCoords.lng);
-
-    // Update places distance
     renderPlacesList(document.getElementById("place-search-input") ? document.getElementById("place-search-input").value : "");
 
     if (isRouteActive && document.getElementById("select-point-a").value === "hub-gps" && !customPointA) {
@@ -1255,23 +1264,6 @@ function handleGPSPositionSuccess(pos, centerMap = true) {
     if (label) label.textContent = `Canlı GPS (±${userCoords.accuracy}m)`;
 
     showToastNotification(`📍 Gerçek konumunuz alındı (Hassasiyet: ±${userCoords.accuracy}m)`, "success");
-}
-
-function handleGPSError(err) {
-    const icon = document.getElementById("gps-status-icon");
-    const label = document.getElementById("gps-status-label");
-    if (icon) icon.className = "fa-solid fa-triangle-exclamation text-amber-400";
-    if (label) label.textContent = "Konum İzni Verin";
-
-    let msg = "Konum alınamadı. Lütfen tarayıcı ayarlarından konum iznini açın.";
-    if (err.code === 1) {
-        msg = "⚠️ Konum izni reddedildi. Lütfen tarayıcı kilit simgesinden (🔒) 'Konuma İzin Ver' yapın.";
-    } else if (err.code === 2) {
-        msg = "⚠️ GPS sinyali zayıf. Açık alanda tekrar deneyin.";
-    } else if (err.code === 3) {
-        msg = "⚠️ GPS zaman aşımına uğradı. Tekrar deneniyor...";
-    }
-    showToastNotification(msg, "warning");
 }
 
 function showToastNotification(message, type = "info") {
@@ -1323,16 +1315,17 @@ function simulateGPS(lat, lng, name) {
     customPointA = null;
     userCoords.lat = lat;
     userCoords.lng = lng;
-    userCoords.accuracy = 5;
+    userCoords.accuracy = 3;
     userCoords.isRealGPS = false;
     userCoords.address = name;
 
     updateUserMarker();
-    map.flyTo([lat, lng], 14, { duration: 1.0 });
+    map.flyTo([lat, lng], 15, { duration: 1.0 });
 
     if (isRouteActive && document.getElementById("select-point-a").value === "hub-gps") {
         calculateCustomABRoute();
     }
+    showToastNotification(`📍 Konum: ${name} olarak ayarlandı`, "info");
 }
 
 function updateUserMarker() {
@@ -1353,13 +1346,13 @@ function updateUserMarker() {
         draggable: true
     }).addTo(map);
 
-    userMarker.bindTooltip(`<b>📍 Bulunduğunuz Canlı Konum</b><br>${userCoords.address}<br><span class="text-[10px] text-emerald-600 font-bold">🎯 İnce ayar için pini sürükleyebilirsiniz</span>`, { direction: 'top' });
+    userMarker.bindTooltip(`<b>📍 Bulunduğunuz Canlı Konum</b><br>${userCoords.address}<br><span class="text-[10px] text-emerald-600 font-bold">🎯 İnce ayar için bu pini sürükleyebilirsiniz</span>`, { direction: 'top' });
 
     userMarker.on('dragend', (e) => {
         const newPos = e.target.getLatLng();
         userCoords.lat = newPos.lat;
         userCoords.lng = newPos.lng;
-        userCoords.accuracy = 3;
+        userCoords.accuracy = 2;
         userCoords.isRealGPS = true;
         
         reverseGeocode(userCoords.lat, userCoords.lng);
@@ -1392,20 +1385,87 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     return (R * c);
 }
 
-// 9. CANLI OTOBÜS ARAÇLARI FİLO TELEMETRİSİ
+// 9. GERÇEK ZAMANA KİLİTLİ OTOBÜS FİLO TELEMETRİSİ (TIME-SYNCHRONIZED REAL TRANSIT)
+// Uygulama kapatılıp açılsa bile otobüsler gerçek saat dilimine göre nerede olması gerekiyorsa oradadır!
+function prepareLinePathDistances() {
+    BUS_LINES_DATA.forEach(line => {
+        let total = 0;
+        line.cumDistances = [0];
+        for (let i = 0; i < line.pathCoords.length - 1; i++) {
+            const p1 = line.pathCoords[i];
+            const p2 = line.pathCoords[i + 1];
+            const dMeters = calculateDistance(p1[0], p1[1], p2[0], p2[1]) * 1000;
+            total += dMeters;
+            line.cumDistances.push(total);
+        }
+        line.totalDistMeters = Math.max(total, 100);
+    });
+}
+
+function getVehiclePositionAtTime(v, line, nowSec) {
+    const cycleDist = line.totalDistMeters * 2; // Gidiş ve dönüş
+    const speedMps = (v.speed || 40) * (1000 / 3600); // km/s to m/s
+    const totalCycleTimeSec = cycleDist / speedMps;
+
+    // Gerçek dünya saatine (Date.now()) kilitli konum hesaplama
+    const currentCycleSec = (nowSec + v.timeOffsetSec) % totalCycleTimeSec;
+    let targetDist = currentCycleSec * speedMps;
+    let isReturnTrip = false;
+
+    if (targetDist > line.totalDistMeters) {
+        targetDist = (2 * line.totalDistMeters) - targetDist;
+        isReturnTrip = true;
+    }
+
+    // İlgili yol segmentini bulma
+    let segIdx = 0;
+    for (let i = 0; i < line.cumDistances.length - 1; i++) {
+        if (targetDist >= line.cumDistances[i] && targetDist <= line.cumDistances[i + 1]) {
+            segIdx = i;
+            break;
+        }
+    }
+
+    const segStartDist = line.cumDistances[segIdx];
+    const segEndDist = line.cumDistances[segIdx + 1] || line.totalDistMeters;
+    const segLen = Math.max(segEndDist - segStartDist, 1);
+    const segProgress = Math.min(Math.max((targetDist - segStartDist) / segLen, 0), 1);
+
+    const p1 = line.pathCoords[segIdx];
+    const p2 = line.pathCoords[segIdx + 1] || p1;
+
+    const lat = p1[0] + (p2[0] - p1[0]) * segProgress;
+    const lng = p1[1] + (p2[1] - p1[1]) * segProgress;
+
+    return { lat, lng, isReturnTrip, segIdx };
+}
+
 function initSimulatedVehicles() {
+    prepareLinePathDistances();
+
     simulatedVehicles = [
-        { id: "veh-line-5g", lineId: "line-5g", code: "5/G", plate: "16 M 0482", color: "#16a34a", pathIndex: 0, progress: 0.1, speed: 42, occupancy: "%45", etaSec: 135, lat: 40.2180, lng: 28.8150 },
-        { id: "veh-line-1m", lineId: "line-1m", code: "1/M", plate: "16 BOI 92", color: "#0284c7", pathIndex: 1, progress: 0.3, speed: 52, occupancy: "%60", etaSec: 210, lat: 40.2920, lng: 28.9250 },
-        { id: "veh-line-1a", lineId: "line-1a", code: "1/A", plate: "16 M 3312", color: "#2563eb", pathIndex: 2, progress: 0.5, speed: 34, occupancy: "%30", etaSec: 85, lat: 40.1850, lng: 29.0600 },
-        { id: "veh-line-38", lineId: "line-38", code: "38", plate: "16 BOI 41", color: "#7c3aed", pathIndex: 1, progress: 0.4, speed: 48, occupancy: "%75", etaSec: 260, lat: 40.2300, lng: 29.0570 },
-        { id: "veh-line-b20a", lineId: "line-b20a", code: "B/20-A", plate: "16 M 2280", color: "#15803d", pathIndex: 1, progress: 0.2, speed: 38, occupancy: "%40", etaSec: 180, lat: 40.1830, lng: 28.9770 },
-        { id: "veh-line-d10", lineId: "line-d10", code: "D/10", plate: "16 M 0815", color: "#9333ea", pathIndex: 0, progress: 0.6, speed: 28, occupancy: "%50", etaSec: 90, lat: 40.1820, lng: 29.1670 },
-        { id: "veh-line-m1", lineId: "line-m1", code: "M1", plate: "Tren #104", color: "#dc2626", pathIndex: 2, progress: 0.7, speed: 65, occupancy: "%80", etaSec: 60, lat: 40.2055, lng: 29.0220 },
-        { id: "veh-line-m2", lineId: "line-m2", code: "M2", plate: "Tren #208", color: "#059669", pathIndex: 3, progress: 0.4, speed: 60, occupancy: "%70", etaSec: 110, lat: 40.2115, lng: 28.9830 }
+        { id: "veh-5g-1", lineId: "line-5g", code: "5/G", plate: "16 M 0482", color: "#16a34a", speed: 42, occupancy: "%45", timeOffsetSec: 120 },
+        { id: "veh-5g-2", lineId: "line-5g", code: "5/G", plate: "16 M 1109", color: "#16a34a", speed: 40, occupancy: "%30", timeOffsetSec: 850 },
+        { id: "veh-1m-1", lineId: "line-1m", code: "1/M", plate: "16 BOI 92", color: "#0284c7", speed: 52, occupancy: "%60", timeOffsetSec: 340 },
+        { id: "veh-1m-2", lineId: "line-1m", code: "1/M", plate: "16 BR 514", color: "#0284c7", speed: 48, occupancy: "%55", timeOffsetSec: 1100 },
+        { id: "veh-1a-1", lineId: "line-1a", code: "1/A", plate: "16 M 3312", color: "#2563eb", speed: 34, occupancy: "%30", timeOffsetSec: 50 },
+        { id: "veh-38-1", lineId: "line-38", code: "38", plate: "16 BOI 41", color: "#7c3aed", speed: 45, occupancy: "%75", timeOffsetSec: 210 },
+        { id: "veh-b20a-1", lineId: "line-b20a", code: "B/20-A", plate: "16 M 2280", color: "#15803d", speed: 38, occupancy: "%40", timeOffsetSec: 460 },
+        { id: "veh-d10-1", lineId: "line-d10", code: "D/10", plate: "16 M 0815", color: "#9333ea", speed: 28, occupancy: "%50", timeOffsetSec: 80 },
+        { id: "veh-m1-1", lineId: "line-m1", code: "M1", plate: "BursaRay Tren #104", color: "#dc2626", speed: 65, occupancy: "%80", timeOffsetSec: 140 },
+        { id: "veh-m2-1", lineId: "line-m2", code: "M2", plate: "BursaRay Tren #208", color: "#059669", speed: 60, occupancy: "%70", timeOffsetSec: 420 }
     ];
 
+    const nowSec = Math.floor(Date.now() / 1000);
+
     simulatedVehicles.forEach(v => {
+        const line = BUS_LINES_DATA.find(l => l.id === v.lineId);
+        if (!line) return;
+
+        const pos = getVehiclePositionAtTime(v, line, nowSec);
+        v.lat = pos.lat;
+        v.lng = pos.lng;
+
         const busIcon = L.divIcon({
             className: 'live-bus-vehicle',
             html: `<div style="background-color: ${v.color};" class="px-2 py-1 rounded-xl text-white font-mono font-black text-[11px] shadow-2xl border-2 border-white flex items-center gap-1 cursor-pointer hover:scale-125 transition active:scale-95"><i class="fa-solid fa-bus text-[10px]"></i> ${v.code}</div>`,
@@ -1414,29 +1474,22 @@ function initSimulatedVehicles() {
         });
 
         v.marker = L.marker([v.lat, v.lng], { icon: busIcon, zIndexOffset: 800 }).addTo(map);
-        v.marker.bindTooltip(`<b>🚌 Hat: ${v.code}</b><br><span class="text-[10px] text-slate-400">Plaka: ${v.plate} • Hız: ${v.speed} km/s</span>`);
+        v.marker.bindTooltip(`<b>🚌 Hat: ${v.code}</b><br><span class="text-[10px] text-slate-500 font-mono">Araç: ${v.plate} • Hız: ${v.speed} km/s<br>Doluluk: ${v.occupancy}</span>`);
         v.marker.on('click', () => {
             showBusLineOnMap(v.lineId);
         });
     });
 
+    // Her 1 saniyede gerçek dünya saatine göre konumu akıcı ilerlet
     setInterval(() => {
+        const currentNowSec = Date.now() / 1000;
         simulatedVehicles.forEach(v => {
             const line = BUS_LINES_DATA.find(l => l.id === v.lineId);
-            if (!line || !line.pathCoords || line.pathCoords.length < 2) return;
+            if (!line) return;
 
-            v.progress += 0.035;
-            if (v.progress >= 1.0) {
-                v.progress = 0;
-                v.pathIndex = (v.pathIndex + 1) % (line.pathCoords.length - 1);
-            }
-
-            const p1 = line.pathCoords[v.pathIndex];
-            const p2 = line.pathCoords[v.pathIndex + 1];
-            if (!p1 || !p2) return;
-
-            v.lat = p1[0] + (p2[0] - p1[0]) * v.progress;
-            v.lng = p1[1] + (p2[1] - p1[1]) * v.progress;
+            const pos = getVehiclePositionAtTime(v, line, currentNowSec);
+            v.lat = pos.lat;
+            v.lng = pos.lng;
             v.marker.setLatLng([v.lat, v.lng]);
         });
     }, 1000);
