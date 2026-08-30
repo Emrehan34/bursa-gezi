@@ -1396,30 +1396,66 @@ function initSimulatedVehicles() {
     }, 1200);
 }
 
-function showBusLineOnMap(lineId, focus = false) {
+function showBusLineOnMap(lineId, focus = true) {
     const line = BUS_LINES_DATA.find(l => l.id === lineId);
     if (!line) return;
 
     activeLineLayerGroup.clearLayers();
 
-    const routeLine = L.polyline(line.pathCoords, {
-        color: line.color,
-        weight: 6,
-        opacity: 0.9,
-        lineCap: 'round'
-    }).addTo(activeLineLayerGroup);
-
+    // 1. Draw stops with distinct numbered icons
     line.stops.forEach((st, idx) => {
         const icon = L.divIcon({
             className: 'line-stop-icon',
-            html: `<div class="w-6 h-6 rounded-full bg-slate-900 border-2 border-white shadow flex items-center justify-center text-white text-[10px] font-bold font-mono">${idx + 1}</div>`,
-            iconSize: [24, 24],
-            iconAnchor: [12, 12]
+            html: `<div style="background-color: ${line.color};" class="w-7 h-7 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-[11px] font-black font-mono">${idx + 1}</div>`,
+            iconSize: [28, 28],
+            iconAnchor: [14, 14]
         });
-        L.marker([st.lat, st.lng], { icon }).addTo(activeLineLayerGroup).bindTooltip(`<b>${idx + 1}. ${st.name}</b>`);
+        L.marker([st.lat, st.lng], { icon })
+            .addTo(activeLineLayerGroup)
+            .bindTooltip(`<b>${idx + 1}. Durak: ${st.name}</b><br><span class="text-[10px] text-slate-500 font-mono">Hat: ${line.code}</span>`);
     });
 
-    map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
+    // 2. Fetch True Street-Snapped Road Polyline from OSRM via waypoints!
+    const coordsParam = line.stops.map(s => `${s.lng},${s.lat}`).join(';');
+    const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${coordsParam}?overview=full&geometries=geojson`;
+
+    // Immediate fallback polyline
+    const tempPolyline = L.polyline(line.pathCoords, {
+        color: line.color,
+        weight: 6,
+        opacity: 0.85,
+        lineCap: 'round',
+        lineJoin: 'round'
+    }).addTo(activeLineLayerGroup);
+
+    if (focus) {
+        map.fitBounds(tempPolyline.getBounds(), { padding: [50, 50] });
+    }
+
+    fetch(osrmUrl)
+        .then(res => res.json())
+        .then(data => {
+            if (data.routes && data.routes.length > 0) {
+                const roadCoords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+                activeLineLayerGroup.removeLayer(tempPolyline);
+                
+                const realRoadPolyline = L.polyline(roadCoords, {
+                    color: line.color,
+                    weight: 7,
+                    opacity: 0.95,
+                    lineCap: 'round',
+                    lineJoin: 'round'
+                }).addTo(activeLineLayerGroup);
+
+                if (focus) {
+                    map.fitBounds(realRoadPolyline.getBounds(), { padding: [50, 50] });
+                }
+            }
+        })
+        .catch(() => {
+            // Keep fallback
+        });
+
     openBusLiveCockpit(line);
 }
 
