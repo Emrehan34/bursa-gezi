@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Bursa Gezi">
+    <meta name="theme-color" content="#020617">
+    <meta name="format-detection" content="telephone=no">
+    
+    <!-- Primary Meta & Social Sharing (WhatsApp, Telegram, X) -->
+    <title>Bursa Gezi Rehberi & Canlı Ulaşım Asistanı</title>
+    <meta name="description" content="Bursa canlı GPS, A'dan B'ye gerçek sokak rotası, otobüs hatları ve saniye saniye canlı varış geri sayımı.">
+    <meta property="og:title" content="Bursa Gezi & Akıllı Ulaşım Asistanı">
+    <meta property="og:description" content="Canlı GPS, otobüs güzergahları ve durağa geliş süreleri">
+    <meta property="og:type" content="website">
+
+    <!-- Leaflet CSS & JS (Cloudflare CDN - Fast & Ultra Reliable) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        input, select, button {
+            touch-action: manipulation;
+        }
+        @media (max-width: 768px) {
+            input, select {
+                font-size: 16px !important; /* Prevents iOS auto-zoom on focus */
+            }
+        }
+        #map {
+            height: 100%;
+            width: 100%;
+            z-index: 10;
+        }
+        .user-marker-pulse {
+            width: 20px;
+            height: 20px;
+            background: #2563eb;
+            border: 3.5px solid #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 0 18px rgba(37, 99, 235, 0.95);
+            position: relative;
+        }
+        .user-marker-pulse::after {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: -12px;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(37, 99, 235, 0.35);
+            animation: pulse-ring 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.6); opacity: 0.95; }
+            100% { transform: scale(1.6); opacity: 0; }
+        }
+        .live-bus-vehicle {
+            transition: all 1.2s linear;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.35));
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f8fafc;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .live-board-screen {
+            background: #090d16;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.8), 0 4px 20px rgba(0,0,0,0.25);
+        }
+        .glow-amber {
+            text-shadow: 0 0 8px rgba(245, 158, 11, 0.7);
+        }
+        .glow-green {
+            text-shadow: 0 0 8px rgba(34, 197, 94, 0.7);
+        }
+        .active-tab-btn {
+            background-color: #0f172a !important;
+            color: #ffffff !important;
+            font-weight: 700 !important;
+        }
+        .point-a-marker {
+            background: #16a34a;
+            color: white;
+            font-weight: 900;
+            border: 3px solid white;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.7);
+        }
+        .point-b-marker {
+            background: #dc2626;
+            color: white;
+            font-weight: 900;
+            border: 3px solid white;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.7);
+        }
+        .toast-notification {
+            animation: slideUp 0.3s ease-out forwards;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 h-screen h-[100dvh] flex flex-col overflow-hidden">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-slate-950 text-white shadow-2xl z-30 flex-none border-b border-slate-800 px-4 py-2.5">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 text-lg shadow-inner">
+                    <i class="fa-solid fa-diamond-turn-right animate-pulse"></i>
+                </div>
+                <div>
+                    <h1 class="text-sm md:text-base font-black tracking-tight flex items-center gap-2">
+                        BURSA ROTA ASİSTANI
+                        <span class="text-[9px] bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 px-2 py-0.5 rounded-full font-mono font-bold uppercase">
+                            GERÇEK YOL AĞI & TRANSİT
+                        </span>
+                    </h1>
+                    <p class="text-[11px] text-slate-400 hidden sm:block">Canlı GPS, A'dan B'ye gerçek sokak rotası ve anlık otobüs takibi</p>
+                </div>
+            </div>
+
+            <!-- GPS Control & Quick Centers -->
+            <div class="flex items-center space-x-2">
+                <button onclick="requestRealGPS()" id="btn-real-gps" class="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-md transition transform active:scale-95">
+                    <i id="gps-status-icon" class="fa-solid fa-location-crosshairs"></i>
+                    <span id="gps-status-label" class="hidden sm:inline">Konumumu Bul</span>
+                </button>
+
+                <!-- Location Selector -->
+                <div class="relative group">
+                    <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1.5 rounded-xl text-xs font-medium flex items-center gap-1.5">
+                        <i class="fa-solid fa-map-pin text-amber-400"></i>
+                        <span class="hidden md:inline">Konum Değiştir</span>
+                    </button>
+                    <div class="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-200 py-2 hidden group-hover:block z-50 text-slate-700 text-xs">
+                        <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Hızlı Başlangıç Konumları</div>
+                        <button onclick="simulateGPS(40.1834, 29.0614, 'Heykel / Ulu Cami Meydanı')" class="w-full text-left px-3.5 py-2 hover:bg-blue-50 hover:text-blue-800 flex items-center justify-between">
+                            <span>🕌 Heykel / Ulu Cami</span>
+                            <span class="text-[10px] text-slate-400 font-mono">Osmangazi</span>
+                        </button>
+                        <button onclick="simulateGPS(40.2115, 28.9830, 'FSM Bulvarı')" class="w-full text-left px-3.5 py-2 hover:bg-blue-50 hover:text-blue-800 flex items-center justify-between">
+                            <span>☕ FSM Bulvarı</span>
+                            <span class="text-[10px] text-slate-400 font-mono">Nilüfer</span>
+                        </button>
+                        <button onclick="simulateGPS(40.2180, 28.9350, 'Özlüce / Küçük Sanayi')" class="w-full text-left px-3.5 py-2 hover:bg-blue-50 hover:text-blue-800 flex items-center justify-between">
+                            <span>🏙️ Özlüce / Ahmet Taner Kışlalı</span>
+                            <span class="text-[10px] text-slate-400 font-mono">Nilüfer</span>
+                        </button>
+                        <button onclick="simulateGPS(40.2240, 28.8475, 'Görükle Üniversite İstasyonu')" class="w-full text-left px-3.5 py-2 hover:bg-blue-50 hover:text-blue-800 flex items-center justify-between">
+                            <span>🎓 Görükle / Üniversite</span>
+                            <span class="text-[10px] text-slate-400 font-mono">Nilüfer</span>
+                        </button>
+                        <button onclick="simulateGPS(40.1950, 29.0220, 'Çekirge Termal / Kükürtlü')" class="w-full text-left px-3.5 py-2 hover:bg-blue-50 hover:text-blue-800 flex items-center justify-between">
+                            <span>♨️ Çekirge / Kükürtlü</span>
+                            <span class="text-[10px] text-slate-400 font-mono">Osmangazi</span>
+                        </button>
+                        <button onclick="simulateGPS(40.2055, 29.0220, 'Acemler Aktarma İstasyonu')" class="w-full text-left px-3.5 py-2 hover:bg-blue-50 hover:text-blue-800 flex items-center justify-between">
+                            <span>🔄 Acemler Aktarma</span>
+                            <span class="text-[10px] text-slate-400 font-mono">Merkez</span>
+                        </button>
+                        <button onclick="simulateGPS(40.2580, 29.0535, 'Bursa Şehirlerarası Terminali')" class="w-full text-left px-3.5 py-2 hover:bg-blue-50 hover:text-blue-800 flex items-center justify-between">
+                            <span>🚌 Bursa Terminali</span>
+                            <span class="text-[10px] text-slate-400 font-mono">Demirtaş</span>
+                        </button>
+                        <button onclick="simulateGPS(40.1870, 29.1650, 'Cumalıkızık / Yıldırım')" class="w-full text-left px-3.5 py-2 hover:bg-blue-50 hover:text-blue-800 flex items-center justify-between">
+                            <span>🏘️ Yıldırım / Cumalıkızık</span>
+                            <span class="text-[10px] text-slate-400 font-mono">Yıldırım</span>
+                        </button>
+                        <button onclick="simulateGPS(40.3752, 28.8820, 'Mudanya BUDO İskelesi')" class="w-full text-left px-3.5 py-2 hover:bg-blue-50 hover:text-blue-800 flex items-center justify-between">
+                            <span>⚓ Mudanya İskelesi</span>
+                            <span class="text-[10px] text-slate-400 font-mono">Mudanya</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace: Left Panel & Right Map Canvas -->
+    <div class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+
+        <!-- Left Drawer / Control Center -->
+        <aside id="main-drawer" class="w-full md:w-[480px] lg:w-[530px] flex-none bg-white shadow-2xl z-20 flex flex-col h-[52vh] md:h-full border-r border-slate-200 transition-all duration-300">
+            <!-- Mobile Swipe / Expand Handle -->
+            <div class="w-full py-1 bg-slate-100 flex items-center justify-center md:hidden border-b border-slate-200 cursor-pointer" onclick="toggleMobileDrawer()">
+                <div class="w-10 h-1 bg-slate-400 rounded-full"></div>
+            </div>
+            
+            <!-- Panel Navigation Tabs -->
+            <div class="flex bg-slate-100 p-1.5 gap-1 text-xs border-b border-slate-200 flex-none">
+                <button onclick="switchAppTab('ab-route')" id="tab-btn-ab-route" class="flex-1 py-2 px-2 rounded-xl font-bold active-tab-btn transition flex items-center justify-center gap-1 shadow-sm">
+                    <i class="fa-solid fa-diamond-turn-right text-emerald-400"></i> A ➔ B Rota
+                </button>
+                <button onclick="switchAppTab('places')" id="tab-btn-places" class="flex-1 py-2 px-2 rounded-xl font-semibold text-slate-600 hover:bg-white transition flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-map-location-dot text-blue-600"></i> Gezilecek Yerler (<span id="count-places">0</span>)
+                </button>
+                <button onclick="switchAppTab('lines')" id="tab-btn-lines" class="flex-1 py-2 px-2 rounded-xl font-semibold text-slate-600 hover:bg-white transition flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-bus text-amber-600"></i> Hatlar & Otobüsler (<span id="count-lines">0</span>)
+                </button>
+                <button onclick="switchAppTab('official-burulas')" id="tab-btn-official-burulas" class="flex-1 py-2 px-2 rounded-xl font-semibold text-slate-600 hover:bg-white transition flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-satellite text-cyan-600"></i> Burulaş GPS
+                </button>
+            </div>
+
+            <!-- TAB 1: POINT A TO POINT B ROUTE PLANNER -->
+            <div id="panel-ab-route" class="flex-1 flex flex-col overflow-hidden bg-slate-50">
+                <!-- A to B Inputs Form -->
+                <div class="p-3.5 bg-white border-b border-slate-200 shadow-sm space-y-3 flex-none">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="fa-solid fa-route text-emerald-600"></i> Gerçek Yol & Güzergah Planlayıcı
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <button onclick="toggleMapClickMode()" id="btn-map-click-mode" class="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1 rounded-lg flex items-center gap-1 border border-slate-300">
+                                <i class="fa-solid fa-crosshairs text-blue-600"></i> Haritadan Tıkla
+                            </button>
+                            <button onclick="swapPointsAandB()" class="text-[11px] text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1">
+                                <i class="fa-solid fa-arrow-right-arrow-left"></i> A ⇄ B
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Point A Input -->
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-emerald-700 uppercase flex items-center justify-between">
+                            <span>🟢 A Noktası (Başlangıç)</span>
+                            <button onclick="setPointAToUserGPS()" class="text-blue-600 hover:underline font-semibold text-[10px]">📍 GPS Konumum Yap</button>
+                        </label>
+                        <select id="select-point-a" class="w-full bg-slate-50 p-2 pl-3 rounded-xl border border-slate-300 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-emerald-500 outline-none">
+                            <!-- Injected via JS -->
+                        </select>
+                    </div>
+
+                    <!-- Point B Input -->
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-rose-700 uppercase flex items-center justify-between">
+                            <span>🔴 B Noktası (Gidilecek Hedef)</span>
+                            <span class="text-[10px] text-slate-400">Gezilecek Yer / Durak</span>
+                        </label>
+                        <select id="select-point-b" class="w-full bg-slate-50 p-2 pl-3 rounded-xl border border-slate-300 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-rose-500 outline-none">
+                            <!-- Injected via JS -->
+                        </select>
+                    </div>
+
+                    <!-- Travel Mode Switcher -->
+                    <div class="flex gap-1.5 pt-1 text-xs">
+                        <button onclick="setTravelMode('transit')" id="mode-btn-transit" class="flex-1 py-1.5 rounded-xl font-bold bg-slate-900 text-white shadow flex items-center justify-center gap-1.5 transition">
+                            <i class="fa-solid fa-bus"></i> Toplu Taşıma
+                        </button>
+                        <button onclick="setTravelMode('drive')" id="mode-btn-drive" class="flex-1 py-1.5 rounded-xl font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-1.5 transition">
+                            <i class="fa-solid fa-car"></i> Araç
+                        </button>
+                        <button onclick="setTravelMode('walk')" id="mode-btn-walk" class="flex-1 py-1.5 rounded-xl font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-1.5 transition">
+                            <i class="fa-solid fa-person-walking"></i> Yürüme
+                        </button>
+                    </div>
+
+                    <!-- Explicit Action Buttons: Rotayı Çiz & Rotayı Kaldır -->
+                    <div class="flex gap-2 pt-2 border-t border-slate-100">
+                        <button onclick="triggerRouteCalculation()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 rounded-xl text-xs font-black shadow-md transition transform active:scale-95 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-diamond-turn-right"></i> Rotayı Çiz
+                        </button>
+                        <button onclick="clearActiveLayers()" class="bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-600 px-3 py-2.5 rounded-xl text-xs font-bold border border-slate-200 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-trash-can"></i> Rotayı Kaldır
+                        </button>
+                    </div>
+                </div>
+
+                <!-- A to B Detailed Route Output Container -->
+                <div id="ab-result-container" class="flex-1 overflow-y-auto p-3.5 space-y-3 custom-scrollbar">
+                    <!-- Injected via JavaScript -->
+                </div>
+            </div>
+
+            <!-- TAB 2: PLACES BROWSER -->
+            <div id="panel-places" class="flex-1 flex flex-col overflow-hidden hidden">
+                <!-- Search & Filters -->
+                <div class="p-3 border-b border-slate-200 bg-slate-50 space-y-2 flex-none">
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
+                        <input type="text" id="place-search-input" onkeyup="filterPlaces()" placeholder="Gezilecek yer, şelale, göl veya mekan ara..." 
+                               class="w-full bg-white pl-9 pr-8 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-blue-500 outline-none transition">
+                    </div>
+
+                    <!-- Category Pills -->
+                    <div class="flex gap-1.5 overflow-x-auto pb-1 custom-scrollbar text-[11px]">
+                        <button onclick="setCategory('all')" class="cat-filter-btn active-cat px-2.5 py-1 rounded-full font-bold whitespace-nowrap bg-slate-900 text-white shadow-sm" data-cat="all">Tümü</button>
+                        <button onclick="setCategory('adrenalin')" class="cat-filter-btn px-2.5 py-1 rounded-full font-medium whitespace-nowrap bg-white text-slate-700 border border-slate-200 hover:border-blue-500" data-cat="adrenalin">⚡ Macera & Rafting</button>
+                        <button onclick="setCategory('tarih')" class="cat-filter-btn px-2.5 py-1 rounded-full font-medium whitespace-nowrap bg-white text-slate-700 border border-slate-200 hover:border-blue-500" data-cat="tarih">🕌 Tarih & Külliye</button>
+                        <button onclick="setCategory('doga')" class="cat-filter-btn px-2.5 py-1 rounded-full font-medium whitespace-nowrap bg-white text-slate-700 border border-slate-200 hover:border-blue-500" data-cat="doga">🌿 Göl & Şelale</button>
+                        <button onclick="setCategory('eglence')" class="cat-filter-btn px-2.5 py-1 rounded-full font-medium whitespace-nowrap bg-white text-slate-700 border border-slate-200 hover:border-blue-500" data-cat="eglence">🎳 Gençlik & Kafe</button>
+                        <button onclick="setCategory('sahil')" class="cat-filter-btn px-2.5 py-1 rounded-full font-medium whitespace-nowrap bg-white text-slate-700 border border-slate-200 hover:border-blue-500" data-cat="sahil">⚓ Sahil & Tirilye</button>
+                    </div>
+
+                    <div class="flex items-center justify-between text-[11px] text-slate-500 pt-0.5">
+                        <span id="places-status-text">Mekanlar listeleniyor...</span>
+                        <button onclick="sortPlacesByDistance()" class="text-blue-700 font-bold hover:underline flex items-center gap-1">
+                            <i class="fa-solid fa-arrow-down-short-wide"></i> Yakına Göre Sırala
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Places Scroll List -->
+                <div id="places-container" class="flex-1 overflow-y-auto p-3 space-y-2.5 custom-scrollbar bg-slate-50">
+                    <!-- Injected via JavaScript -->
+                </div>
+            </div>
+
+            <!-- TAB 3: ALL BUS LINES & REAL-TIME SCHEDULES -->
+            <div id="panel-lines" class="flex-1 flex flex-col overflow-hidden hidden bg-slate-50">
+                <div class="p-3 bg-white border-b border-slate-200 text-xs text-slate-600 flex-none space-y-1">
+                    <p class="font-bold text-slate-900 flex items-center gap-1.5">
+                        <i class="fa-solid fa-route text-blue-600"></i> Bursa Otobüs & Raylı Sistem Hatları
+                    </p>
+                    <p class="text-[11px] text-slate-500">Bir hatta tıkladığınızda otobüsün nereden nereye gittiği haritada canlı olarak çizilir.</p>
+                </div>
+
+                <!-- Bus Lines List -->
+                <div id="lines-container" class="flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar">
+                    <!-- Injected via JavaScript -->
+                </div>
+            </div>
+
+            <!-- TAB 4: OFFICIAL BURULAŞ EMBEDDED LIVE PORTAL -->
+            <div id="panel-official-burulas" class="flex-1 flex flex-col overflow-hidden hidden bg-white">
+                <div class="p-3 bg-slate-900 text-white text-xs flex items-center justify-between border-b border-slate-800">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                        <b class="text-emerald-400">Burulaş Canlı Otobüsüm Nerede Portalı</b>
+                    </div>
+                    <a href="https://bus.burulas.com.tr" target="_blank" class="text-blue-400 hover:underline flex items-center gap-1 text-[11px]">
+                        Yeni Sekmede Aç <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+                </div>
+                <div class="flex-1 w-full h-full relative">
+                    <iframe src="https://bus.burulas.com.tr" class="w-full h-full border-none" title="Burulaş Canlı Takip"></iframe>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Right / Interactive Map Canvas -->
+        <main class="flex-1 h-[52vh] md:h-full relative overflow-hidden bg-slate-100 min-h-[350px]">
+            <div id="map" class="absolute inset-0 w-full h-full" style="width:100%; height:100%; min-height:350px; z-index:10;"></div>
+
+            <!-- MAP CLICK INSTRUCTION OVERLAY (Shows when user turns on Map Click Mode) -->
+            <div id="map-click-indicator" class="absolute top-4 left-1/2 transform -translate-x-1/2 bg-slate-950/95 text-white px-4 py-2 rounded-full shadow-2xl border border-emerald-500/50 z-20 text-xs font-bold hidden flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span id="map-click-text">Haritada bir noktaya tıklayarak A (Başlangıç) belirleyin</span>
+                <button onclick="toggleMapClickMode()" class="text-slate-400 hover:text-white ml-2"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- LIVE BUS COCKPIT / TRACKING HUD -->
+            <div id="bus-live-cockpit" class="absolute top-4 left-4 right-4 md:left-6 md:right-auto md:w-[420px] bg-slate-950/95 backdrop-blur-md text-white p-3.5 rounded-2xl shadow-2xl border border-slate-800 z-20 hidden transition-all duration-300">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                    <div class="flex items-center space-x-2.5">
+                        <span id="cockpit-badge" class="bg-blue-600 text-white font-mono font-black text-xs px-2 py-0.5 rounded-md shadow">5/G</span>
+                        <div>
+                            <h4 id="cockpit-title" class="text-xs font-bold text-white leading-tight">Gölyazı Hattı</h4>
+                            <span id="cockpit-plate" class="text-[10px] text-slate-400 font-mono">Araç: 16 M 0482 (Bursa Büyükşehir)</span>
+                        </div>
+                    </div>
+                    <button onclick="closeBusLiveCockpit()" class="text-slate-400 hover:text-white p-1">
+                        <i class="fa-solid fa-xmark text-sm"></i>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2 py-2 text-center text-[11px] font-mono border-b border-slate-800 my-1">
+                    <div class="bg-slate-900 p-1.5 rounded-lg">
+                        <span class="text-[9px] text-slate-400 block">Anlık Hız</span>
+                        <b id="cockpit-speed" class="text-emerald-400 glow-green">42 km/s</b>
+                    </div>
+                    <div class="bg-slate-900 p-1.5 rounded-lg">
+                        <span class="text-[9px] text-slate-400 block">Sıradaki Durak</span>
+                        <b id="cockpit-next-stop" class="text-amber-400 truncate block text-[10px]">İzmir Yolu</b>
+                    </div>
+                    <div class="bg-slate-900 p-1.5 rounded-lg">
+                        <span class="text-[9px] text-slate-400 block">Kalan Süre</span>
+                        <b id="cockpit-eta" class="text-cyan-400 glow-cyan">2 dk 15s</b>
+                    </div>
+                </div>
+
+                <div class="text-[11px] text-slate-300 space-y-1 pt-1">
+                    <div class="flex items-center justify-between text-[10px] text-slate-400">
+                        <span>Güzergah Durakları:</span>
+                        <span id="cockpit-stop-count">Toplam 14 Durak</span>
+                    </div>
+                    <div id="cockpit-stops-timeline" class="flex items-center gap-1 overflow-x-auto pb-1 text-[10px] font-mono custom-scrollbar">
+                        <!-- Injected via JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Floating Map Control Buttons -->
+            <div class="absolute top-4 right-4 z-20 flex flex-col gap-2">
+                <button onclick="centerOnUser()" title="GPS Konumuma Odakla" class="w-10 h-10 rounded-xl bg-white text-blue-600 shadow-xl flex items-center justify-center border border-slate-200 hover:bg-slate-50 transition active:scale-90">
+                    <i class="fa-solid fa-location-crosshairs text-base"></i>
+                </button>
+                <button onclick="fitMapBounds()" title="Tüm Haritayı Gör" class="w-10 h-10 rounded-xl bg-white text-emerald-600 shadow-xl flex items-center justify-center border border-slate-200 hover:bg-slate-50 transition active:scale-90">
+                    <i class="fa-solid fa-expand text-base"></i>
+                </button>
+                <button onclick="clearActiveLayers()" title="Rotayı Temizle" class="w-10 h-10 rounded-xl bg-white text-rose-600 shadow-xl flex items-center justify-center border border-slate-200 hover:bg-slate-50 transition active:scale-90">
+                    <i class="fa-solid fa-trash-can text-base"></i>
+                </button>
+            </div>
+
+            <!-- Selected Place Floating Card -->
+            <div id="floating-place-card" class="absolute bottom-4 left-4 right-4 md:left-6 md:right-auto md:w-96 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-2xl border border-slate-200 z-20 hidden transition-all duration-300">
+                <div class="flex items-start justify-between">
+                    <div class="flex items-center space-x-3">
+                        <span id="float-icon" class="text-3xl">🏛️</span>
+                        <div>
+                            <span id="float-category" class="text-[10px] font-bold text-blue-600 uppercase tracking-wider bg-blue-50 px-2 py-0.5 rounded-full">Tarih</span>
+                            <h4 id="float-title" class="text-sm font-bold text-slate-900 leading-tight mt-0.5">Mekan Adı</h4>
+                        </div>
+                    </div>
+                    <button onclick="closeFloatingCard()" class="text-slate-400 hover:text-slate-600 p-1">
+                        <i class="fa-solid fa-xmark text-base"></i>
+                    </button>
+                </div>
+
+                <p id="float-desc" class="text-xs text-slate-600 mt-2 line-clamp-2">Açıklama</p>
+
+                <!-- Transit Summary -->
+                <div class="mt-2.5 p-2.5 bg-slate-950 rounded-xl text-white space-y-1 text-xs font-mono">
+                    <div class="flex items-center justify-between text-emerald-400 font-bold text-[11px]">
+                        <span><i class="fa-solid fa-bus"></i> Otobüs & Aktarma:</span>
+                        <span id="float-transit-time">~25 dk</span>
+                    </div>
+                    <p id="float-transit-route" class="text-[11px] text-slate-300 font-sans leading-relaxed">Toplu taşıma bilgisi hesaplanıyor...</p>
+                </div>
+
+                <div class="mt-3 flex items-center gap-2">
+                    <button id="float-btn-set-b" onclick="setPlaceAsDestinationB()" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white py-2 rounded-xl text-xs font-bold shadow transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-location-dot"></i> Buraya Rota Çiz (B)
+                    </button>
+                    <button id="float-btn-view-line" onclick="showPlaceDirectRouteOnMap()" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white py-2 rounded-xl text-xs font-bold shadow transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-route text-amber-400"></i> Güzergahı Gör
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Application Logic -->
+    <script src="app.js"></script>
+</body>
+</html>
