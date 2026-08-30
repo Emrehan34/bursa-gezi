@@ -1613,101 +1613,28 @@ function showBusLineOnMap(lineId, focus = true) {
 
 function openBusLiveCockpit(line) {
     const cockpit = document.getElementById("bus-live-cockpit");
+    if (!cockpit) return;
+
     document.getElementById("cockpit-badge").textContent = line.code;
     document.getElementById("cockpit-badge").style.backgroundColor = line.color;
     document.getElementById("cockpit-title").textContent = line.name;
     document.getElementById("cockpit-stop-count").textContent = `Toplam ${line.stops.length} Durak`;
 
-    const timeline = document.getElementById("cockpit-stops-timeline");
-    timeline.innerHTML = "";
-    line.stops.forEach((st, i) => {
-        const itm = document.createElement("span");
-        itm.className = "bg-slate-900 border border-slate-800 px-2 py-1 rounded whitespace-nowrap text-[10px]";
-        itm.innerHTML = `<b class="text-blue-400">${i + 1}.</b> ${st.name}`;
-        timeline.appendChild(itm);
-    });
-
-    cockpit.classList.remove("hidden");
-}
-
-function showBusLineOnMap(lineId, focus = true) {
-    const line = BUS_LINES_DATA.find(l => l.id === lineId);
-    if (!line) return;
-
-    activeLineLayerGroup.clearLayers();
-
-    // 1. Draw stops with distinct numbered icons
-    line.stops.forEach((st, idx) => {
-        const icon = L.divIcon({
-            className: 'line-stop-icon',
-            html: `<div style="background-color: ${line.color};" class="w-7 h-7 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-[11px] font-black font-mono">${idx + 1}</div>`,
-            iconSize: [28, 28],
-            iconAnchor: [14, 14]
-        });
-        L.marker([st.lat, st.lng], { icon })
-            .addTo(activeLineLayerGroup)
-            .bindTooltip(`<b>${idx + 1}. Durak: ${st.name}</b><br><span class="text-[10px] text-slate-500 font-mono">Hat: ${line.code}</span>`);
-    });
-
-    // 2. Fetch True Street-Snapped Road Polyline from OSRM via waypoints!
-    const coordsParam = line.stops.map(s => `${s.lng},${s.lat}`).join(';');
-    const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${coordsParam}?overview=full&geometries=geojson`;
-
-    // Immediate fallback polyline
-    const tempPolyline = L.polyline(line.pathCoords, {
-        color: line.color,
-        weight: 6,
-        opacity: 0.85,
-        lineCap: 'round',
-        lineJoin: 'round'
-    }).addTo(activeLineLayerGroup);
-
-    if (focus) {
-        map.fitBounds(tempPolyline.getBounds(), { padding: [50, 50] });
+    const burulasLink = document.getElementById("cockpit-burulas-link");
+    if (burulasLink) {
+        burulasLink.href = `https://bus.burulas.com.tr/tr/bursa/howtogo?line=${encodeURIComponent(line.code)}`;
     }
 
-    fetch(osrmUrl)
-        .then(res => res.json())
-        .then(data => {
-            if (data.routes && data.routes.length > 0) {
-                const roadCoords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
-                activeLineLayerGroup.removeLayer(tempPolyline);
-                
-                const realRoadPolyline = L.polyline(roadCoords, {
-                    color: line.color,
-                    weight: 7,
-                    opacity: 0.95,
-                    lineCap: 'round',
-                    lineJoin: 'round'
-                }).addTo(activeLineLayerGroup);
-
-                if (focus) {
-                    map.fitBounds(realRoadPolyline.getBounds(), { padding: [50, 50] });
-                }
-            }
-        })
-        .catch(() => {
-            // Keep fallback
-        });
-
-    openBusLiveCockpit(line);
-}
-
-function openBusLiveCockpit(line) {
-    const cockpit = document.getElementById("bus-live-cockpit");
-    document.getElementById("cockpit-badge").textContent = line.code;
-    document.getElementById("cockpit-badge").style.backgroundColor = line.color;
-    document.getElementById("cockpit-title").textContent = line.name;
-    document.getElementById("cockpit-stop-count").textContent = `Toplam ${line.stops.length} Durak`;
-
     const timeline = document.getElementById("cockpit-stops-timeline");
-    timeline.innerHTML = "";
-    line.stops.forEach((st, i) => {
-        const itm = document.createElement("span");
-        itm.className = "bg-slate-900 border border-slate-800 px-2 py-1 rounded whitespace-nowrap text-[10px]";
-        itm.innerHTML = `<b class="text-blue-400">${i + 1}.</b> ${st.name}`;
-        timeline.appendChild(itm);
-    });
+    if (timeline) {
+        timeline.innerHTML = "";
+        line.stops.forEach((st, i) => {
+            const itm = document.createElement("span");
+            itm.className = "bg-slate-900 border border-slate-800 px-2 py-1 rounded whitespace-nowrap text-[10px]";
+            itm.innerHTML = `<b class="text-blue-400">${i + 1}.</b> ${st.name}`;
+            timeline.appendChild(itm);
+        });
+    }
 
     cockpit.classList.remove("hidden");
 }
