@@ -628,11 +628,13 @@ function initMap() {
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    lightTileLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    // CartoDB Voyager: Clean, modern, high-aesthetic light map
+    lightTileLayer = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
         maxZoom: 19,
-        subdomains: ['a', 'b', 'c']
+        subdomains: 'abcd'
     });
 
+    // CartoDB Dark Matter: High-tech, sleek dark map
     darkTileLayer = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
         maxZoom: 19,
         subdomains: 'abcd'
@@ -646,21 +648,31 @@ function initMap() {
     updateUserMarker();
 }
 
+function resetBursaCenter() {
+    if (map) {
+        map.flyTo([40.1885, 29.0610], 13, { animate: true, duration: 1.0 });
+        showToastNotification("📍 Bursa genel görünümüne odaklandı", "info");
+    }
+}
+
 function toggleDarkMode() {
     isDarkMode = !isDarkMode;
+    const html = document.documentElement;
     const body = document.body;
     const icon = document.getElementById("dark-mode-icon");
 
     if (isDarkMode) {
+        html.classList.add("dark");
         body.classList.add("dark-mode");
         if (map.hasLayer(lightTileLayer)) map.removeLayer(lightTileLayer);
         darkTileLayer.addTo(map);
         if (icon) icon.className = "fa-solid fa-sun text-amber-400";
     } else {
+        html.classList.remove("dark");
         body.classList.remove("dark-mode");
         if (map.hasLayer(darkTileLayer)) map.removeLayer(darkTileLayer);
         lightTileLayer.addTo(map);
-        if (icon) icon.className = "fa-solid fa-moon text-amber-300";
+        if (icon) icon.className = "fa-solid fa-moon text-slate-700 dark:text-amber-300";
     }
 }
 
@@ -672,8 +684,8 @@ function switchAppTab(tabId) {
         const btn = document.getElementById(`tab-btn-${p}`);
         if (el) el.classList.add('hidden');
         if (btn) {
-            btn.classList.remove('active-tab-btn', 'bg-slate-900', 'text-white');
-            btn.classList.add('text-slate-600');
+            btn.classList.remove('tab-btn-active');
+            btn.classList.add('text-slate-600', 'dark:text-slate-400');
         }
     });
 
@@ -681,8 +693,8 @@ function switchAppTab(tabId) {
     const activeBtn = document.getElementById(`tab-btn-${tabId}`);
     if (activePanel) activePanel.classList.remove('hidden');
     if (activeBtn) {
-        activeBtn.classList.add('active-tab-btn', 'bg-slate-900', 'text-white');
-        activeBtn.classList.remove('text-slate-600');
+        activeBtn.classList.add('tab-btn-active');
+        activeBtn.classList.remove('text-slate-600', 'dark:text-slate-400');
     }
 }
 
@@ -691,9 +703,9 @@ function toggleMobileDrawer() {
     if (!drawer) return;
     isMobileDrawerExpanded = !isMobileDrawerExpanded;
     if (isMobileDrawerExpanded) {
-        drawer.style.height = "85vh";
+        drawer.style.height = "86vh";
     } else {
-        drawer.style.height = "50vh";
+        drawer.style.height = "52vh";
     }
     setTimeout(() => { if (map) map.invalidateSize(); }, 300);
 }
@@ -725,44 +737,58 @@ function renderLiveBusDepartureBoard(query = "") {
     filtered.forEach(line => {
         const eta = calculateBusEtaForLine(line.intervalMin || 15);
         const card = document.createElement("div");
-        card.className = "bg-slate-950 border border-slate-800 hover:border-slate-700 p-3 rounded-xl shadow transition cursor-pointer flex flex-col gap-2";
+        card.className = "bg-slate-950/90 border border-slate-800/80 hover:border-emerald-500/50 p-3.5 rounded-2xl shadow-lg transition-all duration-200 cursor-pointer flex flex-col gap-2.5 group";
         card.setAttribute("data-line-id", line.id);
         card.setAttribute("data-interval", line.intervalMin || 15);
 
         let badgeClass = "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40";
-        let statusText = "🟢 Durağa Yanaşıyor";
+        let statusDot = "bg-emerald-400 animate-ping";
+        let statusText = "Durağa Yanaşıyor";
         if (eta.mins > 8) {
             badgeClass = "bg-amber-500/20 text-amber-400 border border-amber-500/40";
-            statusText = `🟡 Yolda (${Math.max(1, Math.round(eta.mins / 3))} durak geride)`;
+            statusDot = "bg-amber-400";
+            statusText = `Yolda (${Math.max(1, Math.round(eta.mins / 3))} durak geride)`;
         } else if (eta.mins > 2) {
             badgeClass = "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
-            statusText = "🟢 Yaklaşıyor";
+            statusDot = "bg-emerald-400";
+            statusText = "Durağa Yaklaşıyor";
         }
+
+        // Random realistic speed & occupancy based on line
+        const mockSpeed = Math.floor(35 + (line.code.length * 4) % 22);
+        const mockOccupancy = Math.floor(30 + (line.intervalMin * 2.5) % 55);
 
         card.innerHTML = `
             <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                    <span style="background-color: ${line.color};" class="px-2 py-1 rounded font-mono font-black text-white text-xs shadow">
+                <div class="flex items-center space-x-2.5">
+                    <span style="background-color: ${line.color};" class="px-2.5 py-1 rounded-xl font-mono font-black text-white text-xs shadow-md">
                         ${line.code}
                     </span>
                     <div>
-                        <h4 class="text-xs font-bold text-white leading-tight">${line.name}</h4>
-                        <span class="text-[10px] text-slate-400">${line.type} • ${line.frequency}</span>
+                        <h4 class="text-xs font-bold text-white leading-tight group-hover:text-emerald-400 transition">${line.name}</h4>
+                        <span class="text-[10px] text-slate-400 font-medium">${line.type} • ${line.frequency}</span>
                     </div>
                 </div>
-                <div class="text-right">
-                    <span class="text-sm font-black font-mono text-emerald-400 eta-countdown-val" data-line="${line.id}">
+                <div class="text-right flex flex-col items-end">
+                    <span class="text-sm font-black font-mono text-emerald-400 eta-countdown-val tracking-tight" data-line="${line.id}">
                         ${eta.mins} dk ${eta.secs}s
                     </span>
-                    <span class="text-[9px] block text-slate-400 font-mono">sonra</span>
+                    <span class="text-[9px] text-slate-400 font-mono">sonra varış</span>
                 </div>
             </div>
 
-            <div class="flex items-center justify-between pt-1 border-t border-slate-800 text-[10px]">
-                <span class="${badgeClass} px-1.5 py-0.5 rounded font-mono font-semibold">${statusText}</span>
-                <span class="text-blue-400 hover:underline flex items-center gap-1 font-bold">
-                    <i class="fa-solid fa-map-location-dot"></i> Haritada İzle
-                </span>
+            <div class="flex items-center justify-between pt-1.5 border-t border-slate-800/80 text-[10px]">
+                <div class="flex items-center gap-1.5 ${badgeClass} px-2 py-0.5 rounded-lg font-mono font-semibold">
+                    <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>
+                    <span>${statusText}</span>
+                </div>
+                <div class="flex items-center gap-2 text-slate-400 font-mono text-[10px]">
+                    <span><i class="fa-solid fa-gauge-high text-slate-500"></i> ${mockSpeed} km/s</span>
+                    <span><i class="fa-solid fa-users text-slate-500"></i> %${mockOccupancy}</span>
+                    <span class="text-emerald-400 font-bold ml-1 flex items-center gap-1 group-hover:underline">
+                        İzle <i class="fa-solid fa-arrow-right text-[9px]"></i>
+                    </span>
+                </div>
             </div>
         `;
 
@@ -821,37 +847,41 @@ function renderPlacesList(filterQuery = "") {
     filtered.forEach(place => {
         const distKm = calculateDistance(userCoords.lat, userCoords.lng, place.lat, place.lng);
         const card = document.createElement("div");
-        card.className = "bg-white p-3 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition space-y-2";
+        card.className = "bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-200/80 dark:border-slate-700/60 p-3.5 shadow-sm hover:shadow-md transition-all space-y-2.5";
         
         let chainHtml = "";
         if (place.transitChain) {
             chainHtml = '<div class="flex items-center gap-1 overflow-x-auto py-1 custom-scrollbar text-[10px]">';
             place.transitChain.forEach((st, i) => {
-                chainHtml += `<span class="px-1.5 py-0.5 rounded ${st.color || 'bg-slate-100 text-slate-700'} whitespace-nowrap font-medium">${st.badge ? `<b class="mr-1">${st.badge}</b>` : ''}${st.text}</span>`;
-                if (i < place.transitChain.length - 1) chainHtml += `<i class="fa-solid fa-angle-right text-slate-300 text-[9px]"></i>`;
+                chainHtml += `<span class="px-2 py-0.5 rounded-lg ${st.color || 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200'} whitespace-nowrap font-semibold">${st.badge ? `<b class="mr-1 font-mono">${st.badge}</b>` : ''}${st.text}</span>`;
+                if (i < place.transitChain.length - 1) chainHtml += `<i class="fa-solid fa-angle-right text-slate-300 dark:text-slate-600 text-[9px]"></i>`;
             });
             chainHtml += '</div>';
         }
 
         card.innerHTML = `
             <div class="flex items-start justify-between">
-                <div class="flex items-center space-x-2">
-                    <span class="text-xl">${place.icon}</span>
+                <div class="flex items-center space-x-2.5">
+                    <span class="text-2xl">${place.icon}</span>
                     <div>
-                        <h4 class="text-xs font-bold text-slate-900 leading-tight">${place.name}</h4>
-                        <span class="text-[10px] text-slate-500">${place.categoryName} • <b>${distKm.toFixed(1)} km</b></span>
+                        <h4 class="text-xs font-black text-slate-900 dark:text-white leading-tight">${place.name}</h4>
+                        <div class="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
+                            <span>${place.categoryName}</span>
+                            <span>•</span>
+                            <span class="text-emerald-600 dark:text-emerald-400 font-bold font-mono">${distKm.toFixed(1)} km yakınınızda</span>
+                        </div>
                     </div>
                 </div>
-                <span class="bg-blue-50 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full font-mono">${place.busCode || 'Ulaşım'}</span>
+                <span class="bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full font-mono border border-blue-200 dark:border-blue-800/60">${place.busCode || 'Ulaşım'}</span>
             </div>
-            <p class="text-[11px] text-slate-600 line-clamp-2">${place.desc}</p>
+            <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-2">${place.desc}</p>
             ${chainHtml}
-            <div class="flex gap-2 pt-1 border-t border-slate-100">
-                <button onclick="setDestinationAndRoute('${place.id}')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-1.5 rounded-lg text-xs font-bold shadow flex items-center justify-center gap-1 transition">
+            <div class="flex gap-2 pt-1 border-t border-slate-100 dark:border-slate-700/60">
+                <button onclick="setDestinationAndRoute('${place.id}')" class="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white py-2 rounded-xl text-xs font-bold shadow-md shadow-emerald-500/20 flex items-center justify-center gap-1.5 transition active:scale-95">
                     <i class="fa-solid fa-diamond-turn-right"></i> Rota Çiz
                 </button>
-                <button onclick="focusPlaceOnMap('${place.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1.5 rounded-lg text-xs font-bold">
-                    <i class="fa-solid fa-location-dot text-blue-600"></i>
+                <button onclick="focusPlaceOnMap('${place.id}')" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition">
+                    <i class="fa-solid fa-location-dot text-blue-600 dark:text-blue-400"></i>
                 </button>
             </div>
         `;
@@ -1398,26 +1428,27 @@ function renderABRouteDirections(pA, pB, distKm, durationMins, steps) {
     if (!container) return;
 
     container.innerHTML = `
-        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm space-y-2 text-xs">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+        <div class="bg-white dark:bg-slate-800/95 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700/60 shadow-md space-y-3 text-xs">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-2.5">
                 <div>
-                    <span class="text-[10px] text-slate-500 font-bold uppercase block">Tahmini Varış Süresi</span>
-                    <b class="text-emerald-700 text-sm font-black">${durationMins} Dakika</b>
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Tahmini Seyahat</span>
+                    <b class="text-emerald-600 dark:text-emerald-400 text-base font-black">${durationMins} Dakika</b>
                 </div>
                 <div class="text-right">
-                    <span class="text-[10px] text-slate-500 font-bold uppercase block">Mesafe</span>
-                    <b class="text-slate-800 text-xs font-mono">${distKm.toFixed(1)} km</b>
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Mesafe</span>
+                    <b class="text-slate-800 dark:text-white text-xs font-mono font-bold">${distKm.toFixed(1)} km</b>
                 </div>
             </div>
 
-            <div class="space-y-1 text-[11px]">
-                <div class="flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                    <span class="font-bold text-slate-800 truncate">A: ${pA.name}</span>
+            <div class="space-y-2 text-[11px]">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-emerald-500 flex items-center justify-center text-white text-[8px] font-bold">A</span>
+                    <span class="font-bold text-slate-800 dark:text-slate-200 truncate">Başlangıç: ${pA.name}</span>
                 </div>
-                <div class="flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-rose-500"></span>
-                    <span class="font-bold text-slate-800 truncate">B: ${pB.name}</span>
+                <div class="w-0.5 h-3 bg-slate-300 dark:bg-slate-600 ml-1.5"></div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-rose-500 flex items-center justify-center text-white text-[8px] font-bold">B</span>
+                    <span class="font-bold text-slate-800 dark:text-slate-200 truncate">Hedef: ${pB.name}</span>
                 </div>
             </div>
         </div>
@@ -1427,21 +1458,22 @@ function renderABRouteDirections(pA, pB, distKm, durationMins, steps) {
     const matchedPlace = PLACES_DATA.find(p => p.name === pB.name || p.id === pB.id);
     if (matchedPlace && matchedPlace.transitChain) {
         const transitCard = document.createElement("div");
-        transitCard.className = "bg-white p-3 rounded-xl border border-blue-200 shadow-sm space-y-2 text-xs";
+        transitCard.className = "bg-white dark:bg-slate-800/95 p-4 rounded-2xl border border-blue-200/80 dark:border-blue-800/60 shadow-md space-y-2.5 text-xs";
         
-        let chainHtml = '<div class="flex items-center gap-1 overflow-x-auto py-1 custom-scrollbar text-[10px]">';
+        let chainHtml = '<div class="flex items-center gap-1.5 overflow-x-auto py-1 custom-scrollbar text-[10px]">';
         matchedPlace.transitChain.forEach((st, i) => {
-            chainHtml += `<span class="px-1.5 py-0.5 rounded ${st.color || 'bg-slate-100 text-slate-700'} whitespace-nowrap font-medium">${st.badge ? `<b class="mr-1">${st.badge}</b>` : ''}${st.text}</span>`;
-            if (i < matchedPlace.transitChain.length - 1) chainHtml += `<i class="fa-solid fa-angle-right text-slate-300 text-[9px]"></i>`;
+            chainHtml += `<span class="px-2 py-0.5 rounded-lg ${st.color || 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200'} whitespace-nowrap font-semibold">${st.badge ? `<b class="mr-1 font-mono">${st.badge}</b>` : ''}${st.text}</span>`;
+            if (i < matchedPlace.transitChain.length - 1) chainHtml += `<i class="fa-solid fa-angle-right text-slate-300 dark:text-slate-600 text-[9px]"></i>`;
         });
         chainHtml += '</div>';
 
         transitCard.innerHTML = `
-            <div class="flex items-center gap-1 text-slate-900 font-bold">
-                <i class="fa-solid fa-bus text-blue-600"></i> Toplu Taşıma Rehberi:
+            <div class="flex items-center gap-1.5 text-slate-900 dark:text-white font-black text-xs">
+                <i class="fa-solid fa-bus text-blue-600 dark:text-blue-400"></i>
+                <span>Önerilen Toplu Taşıma Aktarma Planı:</span>
             </div>
             ${chainHtml}
-            <p class="text-[11px] text-slate-600 pt-1">${matchedPlace.transit}</p>
+            <p class="text-[11px] text-slate-600 dark:text-slate-300 pt-1 leading-relaxed">${matchedPlace.transit}</p>
         `;
         container.appendChild(transitCard);
     }
