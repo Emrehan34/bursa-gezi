@@ -8,8 +8,8 @@
     <meta name="apple-mobile-web-app-title" content="Bursa Prestige">
     <meta name="theme-color" content="#07090e">
     
-    <title>BURSA PRESTIGE • Akıllı Canlı Ulaşım & Gezi Kokpiti</title>
-    <meta name="description" content="Bursa'nın en seçkin gezi rehberi, A'dan B'ye canlı karayolu rotası ve Burulaş telemetrili akıllı varış panosu.">
+    <title>BURSA PRESTIGE • Luxury City & Transit Concierge</title>
+    <meta name="description" content="Bursa'nın en seçkin gezi ve ulaşım deneyimi. Canlı telemetri, kişisel rota asistanı ve küratörlü koleksiyonlar.">
 
     <!-- Leaflet CSS & JS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
@@ -18,10 +18,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome Pro Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono & Cinzel -->
+    <!-- Google Fonts: Syne & Plus Jakarta Sans & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     
     <script>
         tailwind.config = {
@@ -30,33 +30,28 @@
                 extend: {
                     fontFamily: {
                         sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        display: ['"Syne"', 'sans-serif'],
                         mono: ['"JetBrains Mono"', 'monospace'],
-                        brand: ['"Cinzel"', 'serif'],
                     },
                     colors: {
-                        obsidian: {
-                            950: '#05070b',
-                            900: '#07090e',
-                            850: '#0c1017',
-                            800: '#121722',
-                            700: '#1c2433'
-                        },
                         gold: {
-                            400: '#fbbf24',
-                            500: '#f59e0b',
-                            600: '#d97706'
+                            300: '#f3e8c8',
+                            400: '#e5c983',
+                            500: '#cba358',
+                            600: '#a37b34',
                         },
-                        emerald: {
-                            400: '#34d399',
-                            500: '#10b981',
-                            600: '#059669'
+                        noir: {
+                            950: '#040608',
+                            900: '#07090e',
+                            850: '#0b0e15',
+                            800: '#10141e',
+                            700: '#171c2a',
                         }
                     },
                     boxShadow: {
-                        'elite': '0 24px 64px -12px rgba(0, 0, 0, 0.75), 0 0 1px 1px rgba(255, 255, 255, 0.08)',
-                        'glow-gold': '0 0 24px rgba(245, 158, 11, 0.25)',
-                        'glow-emerald': '0 0 24px rgba(16, 185, 129, 0.35)',
-                        'dock': '0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                        'luxe': '0 30px 80px -15px rgba(0, 0, 0, 0.9), 0 0 1px 1px rgba(255, 255, 255, 0.08)',
+                        'gold-glow': '0 0 35px rgba(203, 163, 88, 0.25)',
+                        'emerald-glow': '0 0 35px rgba(16, 185, 129, 0.35)',
                     }
                 }
             }
@@ -74,8 +69,8 @@
             padding: 0;
             overflow: hidden;
             background-color: #07090e;
+            color: #f8fafc;
             font-family: 'Plus Jakarta Sans', sans-serif;
-            color: #f1f5f9;
             overscroll-behavior: none;
             -webkit-font-smoothing: antialiased;
         }
@@ -92,82 +87,72 @@
             z-index: 1;
         }
         
-        /* Ultra-Luxury Glass Panels */
-        .elite-glass {
-            background: rgba(10, 14, 22, 0.82);
-            backdrop-filter: blur(28px) saturate(180%);
-            -webkit-backdrop-filter: blur(28px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.09);
-            box-shadow: 0 24px 60px -15px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+        /* Ultra-Luxury Satin Glass Acrylic */
+        .luxe-glass {
+            background: linear-gradient(135deg, rgba(16, 20, 30, 0.88) 0%, rgba(8, 11, 17, 0.94) 100%);
+            backdrop-filter: blur(36px) saturate(190%);
+            -webkit-backdrop-filter: blur(36px) saturate(190%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 32px 80px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.12);
         }
-        .elite-glass-light {
-            background: rgba(255, 255, 255, 0.90);
-            backdrop-filter: blur(24px) saturate(160%);
-            -webkit-backdrop-filter: blur(24px) saturate(160%);
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.15);
+        
+        .luxe-card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .luxe-card:hover {
+            border-color: rgba(203, 163, 88, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
         }
 
-        /* Ambient Glow Background Orbs */
-        .ambient-glow-1 {
+        /* Ambient Lighting */
+        .ambient-radial-1 {
             position: absolute;
-            top: -100px;
-            left: 20%;
-            width: 450px;
-            height: 450px;
-            background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
-            pointer-events: none;
-            z-index: 2;
-        }
-        .ambient-glow-2 {
-            position: absolute;
-            bottom: -100px;
-            right: 15%;
+            top: -120px;
+            left: 15%;
             width: 500px;
             height: 500px;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.10) 0%, rgba(0, 0, 0, 0) 70%);
+            background: radial-gradient(circle, rgba(203, 163, 88, 0.12) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 2;
+        }
+        .ambient-radial-2 {
+            position: absolute;
+            bottom: -150px;
+            right: 10%;
+            width: 550px;
+            height: 550px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.10) 0%, transparent 70%);
             pointer-events: none;
             z-index: 2;
         }
 
-        /* Pulsing High-Precision User Marker */
+        /* Pulsing Gold / Emerald Radar Marker */
         .user-marker-pulse {
             width: 22px;
             height: 22px;
             background: #10b981;
             border: 3.5px solid #ffffff;
             border-radius: 50%;
-            box-shadow: 0 0 25px rgba(16, 185, 129, 1);
+            box-shadow: 0 0 28px rgba(16, 185, 129, 1);
             position: relative;
         }
         .user-marker-pulse::after {
             content: '';
             position: absolute;
-            top: -12px;
-            left: -12px;
-            width: 40px;
-            height: 40px;
+            top: -13px;
+            left: -13px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
             background: rgba(16, 185, 129, 0.35);
             animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
         }
         @keyframes pulse-ring {
             0% { transform: scale(0.6); opacity: 0.95; }
-            100% { transform: scale(1.8); opacity: 0; }
-        }
-
-        /* Radar Scanner Effect */
-        .radar-sweep-beam {
-            position: absolute;
-            inset: 0;
-            border-radius: 50%;
-            background: conic-gradient(from 0deg, rgba(16, 185, 129, 0) 0deg, rgba(16, 185, 129, 0.35) 360deg);
-            animation: spin-radar 4s linear infinite;
-            pointer-events: none;
-        }
-        @keyframes spin-radar {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            100% { transform: scale(1.9); opacity: 0; }
         }
 
         /* Custom Scrollbar */
@@ -179,133 +164,134 @@
             background: transparent;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.12);
             border-radius: 9999px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: rgba(16, 185, 129, 0.5);
+            background: rgba(203, 163, 88, 0.5);
         }
 
-        /* Active Dock Item Glow */
+        /* Active Dock Item */
         .dock-item-active {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(5, 150, 105, 0.45) 100%) !important;
-            border-color: rgba(52, 211, 153, 0.6) !important;
+            background: linear-gradient(135deg, rgba(203, 163, 88, 0.22) 0%, rgba(163, 123, 52, 0.38) 100%) !important;
+            border: 1px solid rgba(229, 201, 131, 0.6) !important;
             color: #ffffff !important;
-            box-shadow: 0 0 16px rgba(16, 185, 129, 0.45) !important;
-            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(203, 163, 88, 0.4) !important;
+            transform: translateY(-3px) scale(1.04);
         }
 
-        /* Safe Area Padding for iOS Notch */
+        /* Safe Bottom Area for iPhone gesture bar */
         .safe-bottom {
             padding-bottom: max(16px, env(safe-area-inset-bottom));
         }
 
-        /* Hide Leaflet Default UI clutter for elite look */
+        /* Leaflet Controls Styling */
         .leaflet-control-attribution {
             display: none !important;
         }
         .leaflet-control-zoom {
             border: none !important;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4) !important;
-            border-radius: 16px !important;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6) !important;
+            border-radius: 20px !important;
             overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
         }
         .leaflet-control-zoom a {
-            background-color: #0c1017 !important;
-            color: #94a3b8 !important;
+            background-color: rgba(11, 14, 21, 0.92) !important;
+            backdrop-filter: blur(16px) !important;
+            color: #e2e8f0 !important;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-            width: 36px !important;
-            height: 36px !important;
-            line-height: 36px !important;
+            width: 38px !important;
+            height: 38px !important;
+            line-height: 38px !important;
         }
         .leaflet-control-zoom a:hover {
-            background-color: #1c2433 !important;
-            color: #ffffff !important;
+            background-color: rgba(23, 28, 42, 0.98) !important;
+            color: #cba358 !important;
         }
     </style>
 </head>
 <body class="relative overflow-hidden select-none">
 
-    <!-- Ambient Visual Glow Effects -->
-    <div class="ambient-glow-1"></div>
-    <div class="ambient-glow-2"></div>
+    <!-- Ambient Ambient Radial Flares -->
+    <div class="ambient-radial-1"></div>
+    <div class="ambient-radial-2"></div>
 
-    <!-- 100% Full-Screen Immersive Map View -->
+    <!-- 100% Full-Screen Cinematic Map -->
     <div id="map"></div>
 
     <!-- ========================================================================= -->
-    <!-- 1. TOP FLOATING "DYNAMIC ISLAND" CAPSULE (APPLE & TESLA COCKPIT INSPIRATION) -->
+    <!-- 1. TOP FLOATING "VIP CONCIERGE" ISLAND (HIGH-FASHION MINIMALIST CAPSULE)  -->
     <!-- ========================================================================= -->
-    <div class="absolute top-3 inset-x-3 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 z-30 flex items-center justify-between md:justify-center gap-2 pointer-events-none">
-        <!-- Floating Glass Pill -->
-        <div class="pointer-events-auto elite-glass px-4 py-2 rounded-full flex items-center gap-3 shadow-elite border border-white/10 max-w-full md:max-w-2xl transition-all duration-300">
-            <!-- Brand Badge -->
-            <div class="flex items-center gap-2 pr-2 border-r border-white/10 cursor-pointer" onclick="resetBursaCenter()">
-                <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-white shadow-glow-emerald">
-                    <i class="fa-solid fa-gem text-xs"></i>
+    <header class="absolute top-4 inset-x-3 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 z-30 flex items-center justify-between md:justify-center gap-2 pointer-events-none">
+        <div class="pointer-events-auto luxe-glass px-4 py-2 rounded-full flex items-center gap-3.5 shadow-luxe max-w-full md:max-w-2xl border border-white/10 transition-all duration-300">
+            
+            <!-- Monogram Brand -->
+            <div class="flex items-center gap-2.5 pr-3 border-r border-white/10 cursor-pointer" onclick="resetBursaCenter()">
+                <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-gold-600 via-gold-500 to-amber-200 flex items-center justify-center text-slate-950 font-display font-black text-xs shadow-gold-glow">
+                    B
                 </div>
-                <div class="hidden sm:block">
-                    <span class="font-brand text-xs font-black tracking-widest text-white block leading-none">BURSA</span>
-                    <span class="text-[9px] font-mono text-emerald-400 tracking-wider">PRESTIGE</span>
+                <div>
+                    <span class="font-display tracking-[0.25em] text-[11px] font-bold text-white block leading-none">BURSA</span>
+                    <span class="text-[8px] font-mono tracking-widest text-gold-400 font-bold uppercase">PRESTIGE</span>
                 </div>
             </div>
 
-            <!-- Live Status & Ticker -->
+            <!-- Real-Time Telemetry Ticker -->
             <div class="flex items-center gap-2 text-xs overflow-hidden">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-none"></span>
-                <div id="dynamic-island-ticker" class="font-mono text-[11px] text-slate-300 truncate max-w-[170px] sm:max-w-[240px]">
-                    <span class="text-emerald-400 font-bold">5/G</span> 3 dk • <span class="text-sky-400 font-bold">1/M</span> 7 dk • <span class="text-purple-400 font-bold">38</span> 2 dk
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-none shadow-emerald-glow"></span>
+                <div id="dynamic-island-ticker" class="font-mono text-[11px] text-slate-300 truncate max-w-[150px] sm:max-w-[220px]">
+                    <span class="text-emerald-400 font-bold">5/G:</span> 3 dk • <span class="text-sky-400 font-bold">1/M:</span> 7 dk • <span class="text-gold-400 font-bold">38:</span> 2 dk
                 </div>
             </div>
 
-            <!-- Precision Clock -->
-            <div class="border-l border-white/10 pl-2 hidden sm:flex items-center gap-1.5 font-mono text-[11px] text-slate-300">
-                <i class="fa-regular fa-clock text-amber-400 text-xs"></i>
-                <span id="elite-clock" class="font-bold text-white">--:--:--</span>
+            <!-- VIP Digital Clock -->
+            <div class="border-l border-white/10 pl-3 hidden sm:flex items-center gap-1.5 font-mono text-[11px] text-slate-300">
+                <span id="elite-clock" class="font-bold text-white tracking-widest">--:--:--</span>
             </div>
 
-            <!-- Quick Action Micro-buttons -->
-            <div class="flex items-center gap-1.5 border-l border-white/10 pl-2">
-                <!-- GPS Locate -->
-                <button onclick="requestRealGPS(true)" id="btn-real-gps" title="Canlı GPS Konumum"
-                        class="w-7 h-7 rounded-full bg-white/5 hover:bg-white/10 text-emerald-400 flex items-center justify-center text-xs transition active:scale-90 border border-white/10">
+            <!-- Concierge Actions -->
+            <div class="flex items-center gap-1.5 border-l border-white/10 pl-3">
+                <!-- High Precision GPS -->
+                <button onclick="requestRealGPS(true)" id="btn-real-gps" title="Konumumu Bul"
+                        class="w-7 h-7 rounded-full bg-white/5 hover:bg-white/15 text-emerald-400 flex items-center justify-center text-xs transition active:scale-90 border border-white/10">
                     <i id="gps-status-icon" class="fa-solid fa-location-crosshairs"></i>
                 </button>
-                <!-- Quick City View -->
-                <button onclick="resetBursaCenter()" title="Bursa Genel Bakış"
-                        class="w-7 h-7 rounded-full bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white flex items-center justify-center text-xs transition active:scale-90 border border-white/10">
-                    <i class="fa-solid fa-arrows-to-dot"></i>
+                <!-- Overview -->
+                <button onclick="resetBursaCenter()" title="Bursa Genel Görünüm"
+                        class="w-7 h-7 rounded-full bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white flex items-center justify-center text-xs transition active:scale-90 border border-white/10">
+                    <i class="fa-solid fa-compass"></i>
                 </button>
-                <!-- Theme Toggle -->
+                <!-- Theme Switcher -->
                 <button onclick="toggleDarkMode()" title="Temayı Değiştir"
-                        class="w-7 h-7 rounded-full bg-white/5 hover:bg-white/10 text-amber-400 flex items-center justify-center text-xs transition active:scale-90 border border-white/10">
+                        class="w-7 h-7 rounded-full bg-white/5 hover:bg-white/15 text-gold-400 flex items-center justify-center text-xs transition active:scale-90 border border-white/10">
                     <i id="dark-mode-icon" class="fa-solid fa-moon"></i>
                 </button>
             </div>
         </div>
-    </div>
+    </header>
 
     <!-- ========================================================================= -->
-    <!-- 2. FLOATING BESPOKE LUXURY SHEETS / MODALS (NON-STANDARD MODULAR PANELS) -->
+    <!-- 2. FLOATING BESPOKE LUXURY SHEETS / MODULARS (NON-STANDARD HUD)           -->
     <!-- ========================================================================= -->
 
-    <!-- PANEL A: AKILLI GÜZERGAH & ROTA PLANLAYICI (A ➔ B) -->
-    <div id="sheet-ab-route" class="absolute bottom-24 md:bottom-28 left-3 right-3 md:left-6 md:right-auto md:w-[460px] z-20 hidden transition-all duration-300">
-        <div class="elite-glass rounded-3xl p-4 shadow-elite space-y-3.5 border border-white/10 max-h-[75vh] flex flex-col">
+    <!-- PANEL 1: AKILLI GÜZERGAH VE ROTA PLANLAYICI (A ➔ B) -->
+    <div id="sheet-ab-route" class="absolute bottom-24 md:bottom-28 left-3 right-3 md:left-6 md:right-auto md:w-[470px] z-20 hidden transition-all duration-300">
+        <div class="luxe-glass rounded-3xl p-4 shadow-luxe space-y-3.5 max-h-[75vh] flex flex-col border border-white/10">
             <!-- Header -->
             <div class="flex items-center justify-between pb-2 border-b border-white/10 flex-none">
-                <div class="flex items-center gap-2">
-                    <div class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs">
-                        <i class="fa-solid fa-diamond-turn-right"></i>
+                <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-xl bg-gold-500/20 text-gold-400 border border-gold-500/30 flex items-center justify-center text-xs shadow-gold-glow">
+                        <i class="fa-solid fa-route"></i>
                     </div>
                     <div>
-                        <h3 class="text-xs font-black tracking-wide text-white uppercase font-mono">AKILLI ROTA NAVİGATÖRÜ</h3>
-                        <span class="text-[10px] text-slate-400">Canlı sokak ve raylı sistem aktarma motoru</span>
+                        <h3 class="text-xs font-display font-bold tracking-widest text-white uppercase">PRESTIGE NAVİGATÖR</h3>
+                        <span class="text-[10px] text-slate-400 font-mono">En Hızlı Sokak ve Aktarma Güzergahı</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-1.5">
-                    <button onclick="swapPointsAandB()" title="Başlangıç ve Hedefi Değiştir" class="text-xs bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white px-2 py-1 rounded-lg border border-white/10 flex items-center gap-1 font-mono transition">
-                        <i class="fa-solid fa-arrow-right-arrow-left text-[10px]"></i> A⇄B
+                    <button onclick="swapPointsAandB()" title="Başlangıç ve Hedefi Değiştir" class="text-xs bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white px-2.5 py-1 rounded-xl border border-white/10 flex items-center gap-1.5 font-mono transition">
+                        <i class="fa-solid fa-arrow-right-arrow-left text-[10px] text-gold-400"></i> A⇄B
                     </button>
                     <button onclick="closeActiveSheet()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition">
                         <i class="fa-solid fa-xmark text-sm"></i>
@@ -313,18 +299,18 @@
                 </div>
             </div>
 
-            <!-- Origin (A) & Destination (B) Selector Cards -->
+            <!-- Route Origin & Destination -->
             <div class="space-y-2 flex-none">
-                <!-- Point A -->
+                <!-- Origin (A) -->
                 <div class="bg-black/30 p-2.5 rounded-2xl border border-white/5 space-y-1">
                     <div class="flex items-center justify-between text-[10px] font-mono text-emerald-400 font-bold">
-                        <span>🟢 BAŞLANGIÇ (A)</span>
-                        <button onclick="setPointAToUserGPS()" class="text-sky-400 hover:underline flex items-center gap-1 font-mono">
+                        <span>🟢 BAŞLANGIÇ NOKTASI (A)</span>
+                        <button onclick="setPointAToUserGPS()" class="text-gold-400 hover:underline flex items-center gap-1 font-mono">
                             <i class="fa-solid fa-crosshairs text-[9px]"></i> Canlı Konumum
                         </button>
                     </div>
                     <div class="relative">
-                        <select id="select-point-a" class="w-full bg-slate-900/90 text-white p-2.5 pl-3 pr-8 rounded-xl border border-white/10 text-xs font-bold outline-none focus:border-emerald-500 transition appearance-none">
+                        <select id="select-point-a" class="w-full bg-slate-900/95 text-white p-2.5 pl-3 pr-8 rounded-xl border border-white/10 text-xs font-bold outline-none focus:border-gold-500 transition appearance-none">
                         </select>
                         <div class="absolute right-3 top-3 pointer-events-none text-slate-400 text-xs">
                             <i class="fa-solid fa-chevron-down"></i>
@@ -332,13 +318,13 @@
                     </div>
                 </div>
 
-                <!-- Point B -->
+                <!-- Destination (B) -->
                 <div class="bg-black/30 p-2.5 rounded-2xl border border-white/5 space-y-1">
                     <div class="text-[10px] font-mono text-rose-400 font-bold">
-                        <span>🔴 HEDEF (B)</span>
+                        <span>🔴 HEDEF NOKTASI (B)</span>
                     </div>
                     <div class="relative">
-                        <select id="select-point-b" class="w-full bg-slate-900/90 text-white p-2.5 pl-3 pr-8 rounded-xl border border-white/10 text-xs font-bold outline-none focus:border-rose-500 transition appearance-none">
+                        <select id="select-point-b" class="w-full bg-slate-900/95 text-white p-2.5 pl-3 pr-8 rounded-xl border border-white/10 text-xs font-bold outline-none focus:border-rose-500 transition appearance-none">
                         </select>
                         <div class="absolute right-3 top-3 pointer-events-none text-slate-400 text-xs">
                             <i class="fa-solid fa-chevron-down"></i>
@@ -346,9 +332,9 @@
                     </div>
                 </div>
 
-                <!-- Travel Mode Selector -->
+                <!-- Mode Selector -->
                 <div class="grid grid-cols-3 gap-1.5 text-xs font-mono">
-                    <button onclick="setTravelMode('transit')" id="mode-btn-transit" class="py-2 rounded-xl font-bold bg-emerald-600 text-white shadow-glow-emerald flex items-center justify-center gap-1.5 transition">
+                    <button onclick="setTravelMode('transit')" id="mode-btn-transit" class="py-2 rounded-xl font-bold bg-gradient-to-r from-gold-600 to-amber-500 text-slate-950 shadow-gold-glow flex items-center justify-center gap-1.5 transition">
                         <i class="fa-solid fa-bus text-xs"></i> Transit
                     </button>
                     <button onclick="setTravelMode('drive')" id="mode-btn-drive" class="py-2 rounded-xl font-semibold bg-white/5 hover:bg-white/10 text-slate-300 flex items-center justify-center gap-1.5 border border-white/10 transition">
@@ -360,12 +346,12 @@
                 </div>
             </div>
 
-            <!-- Route Action Buttons -->
+            <!-- Route Buttons -->
             <div class="flex gap-2 flex-none">
-                <button onclick="triggerRouteCalculation()" class="flex-1 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white py-2.5 rounded-2xl text-xs font-black tracking-wider uppercase shadow-glow-emerald active:scale-95 transition flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-diamond-turn-right"></i> Rotayı Hesapla
+                <button onclick="triggerRouteCalculation()" class="flex-1 bg-gradient-to-r from-gold-500 via-amber-400 to-gold-600 hover:from-gold-400 hover:to-amber-300 text-slate-950 py-2.5 rounded-2xl text-xs font-display font-black tracking-wider uppercase shadow-gold-glow active:scale-95 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-diamond-turn-right"></i> Güzergahı Çiz
                 </button>
-                <button onclick="toggleMapClickMode()" id="btn-map-click-mode" title="Haritadan Tıklayarak Seç" class="bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white px-3.5 py-2.5 rounded-2xl text-xs font-bold border border-white/10 transition">
+                <button onclick="toggleMapClickMode()" id="btn-map-click-mode" title="Haritadan Tıklayarak Seç" class="bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white px-3.5 py-2.5 rounded-2xl text-xs font-bold border border-white/10 transition">
                     <i class="fa-solid fa-crosshairs text-sky-400"></i>
                 </button>
                 <button onclick="clearActiveLayers()" title="Temizle" class="bg-white/5 hover:bg-rose-950/60 hover:text-rose-400 text-slate-400 px-3.5 py-2.5 rounded-2xl text-xs font-bold border border-white/10 transition">
@@ -373,26 +359,26 @@
                 </button>
             </div>
 
-            <!-- Route Results Details -->
+            <!-- Route Details -->
             <div id="ab-result-container" class="overflow-y-auto space-y-2.5 custom-scrollbar pr-1 flex-1">
                 <div class="p-6 text-center text-slate-500 space-y-2">
-                    <i class="fa-solid fa-map-location-dot text-3xl opacity-40"></i>
-                    <p class="text-xs">Noktaları seçip <b>Rotayı Hesapla</b> butonuna dokunun.</p>
+                    <i class="fa-solid fa-map-location-dot text-3xl opacity-30 text-gold-400"></i>
+                    <p class="text-xs">Başlangıç ve hedef seçip <b>Güzergahı Çiz</b> butonuna dokunun.</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- PANEL B: CANLI DURAĞA VARIŞ PANOSU (BURULAŞ TELEMETRİ) -->
-    <div id="sheet-live-eta" class="absolute bottom-24 md:bottom-28 left-3 right-3 md:left-6 md:right-auto md:w-[460px] z-20 hidden transition-all duration-300">
-        <div class="elite-glass rounded-3xl p-4 shadow-elite space-y-3.5 border border-white/10 max-h-[75vh] flex flex-col">
+    <!-- PANEL 2: CANLI VARIŞ PANOSU (BURULAŞ TELEMETRİ) -->
+    <div id="sheet-live-eta" class="absolute bottom-24 md:bottom-28 left-3 right-3 md:left-6 md:right-auto md:w-[470px] z-20 hidden transition-all duration-300">
+        <div class="luxe-glass rounded-3xl p-4 shadow-luxe space-y-3.5 max-h-[75vh] flex flex-col border border-white/10">
             <!-- Header -->
             <div class="flex items-center justify-between pb-2 border-b border-white/10 flex-none">
-                <div class="flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                <div class="flex items-center gap-2.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping shadow-emerald-glow"></span>
                     <div>
-                        <h3 class="text-xs font-black tracking-wide text-white uppercase font-mono">DİJİTAL VARIŞ PANOSU</h3>
-                        <span class="text-[10px] text-slate-400 font-mono">Gerçek Zamanlı Otobüs Geri Sayımı</span>
+                        <h3 class="text-xs font-display font-bold tracking-widest text-white uppercase">DİJİTAL VARIŞ RADARI</h3>
+                        <span class="text-[10px] text-slate-400 font-mono">Burulaş Canlı Telemetri & Dakika Sayacı</span>
                     </div>
                 </div>
                 <button onclick="closeActiveSheet()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition">
@@ -400,32 +386,32 @@
                 </button>
             </div>
 
-            <!-- Search Filter -->
+            <!-- Search -->
             <div class="relative flex-none">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-500 text-xs"></i>
-                <input type="text" id="bus-board-search" onkeyup="filterBusDepartureBoard()" placeholder="Hat kodu veya durak adı (Örn: 5/G, 1/M, 38)..." 
-                       class="w-full bg-black/40 border border-white/10 text-white placeholder-slate-500 text-xs pl-9 pr-3.5 py-2.5 rounded-2xl outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 font-mono transition">
+                <input type="text" id="bus-board-search" onkeyup="filterBusDepartureBoard()" placeholder="Hat veya durak ara (5/G, 1/M, 38, B/20-A)..." 
+                       class="w-full bg-black/40 border border-white/10 text-white placeholder-slate-500 text-xs pl-9 pr-3.5 py-2.5 rounded-2xl outline-none focus:border-gold-500 font-mono transition">
             </div>
 
-            <!-- Live List -->
+            <!-- List -->
             <div id="bus-departure-board-list" class="overflow-y-auto space-y-2.5 custom-scrollbar pr-1 flex-1">
                 <!-- Injected via JavaScript -->
             </div>
         </div>
     </div>
 
-    <!-- PANEL C: SEÇKİN GEZİ KOLEKSİYONLARI (BURSA PRESTIGE PLACES) -->
-    <div id="sheet-places" class="absolute bottom-24 md:bottom-28 left-3 right-3 md:left-6 md:right-auto md:w-[480px] z-20 hidden transition-all duration-300">
-        <div class="elite-glass rounded-3xl p-4 shadow-elite space-y-3.5 border border-white/10 max-h-[78vh] flex flex-col">
+    <!-- PANEL 3: SEÇKİN GEZİ KOLEKSİYONU (FOTOĞRAFLI EDİTORYAL KARTLAR) -->
+    <div id="sheet-places" class="absolute bottom-24 md:bottom-28 left-3 right-3 md:left-6 md:right-auto md:w-[490px] z-20 hidden transition-all duration-300">
+        <div class="luxe-glass rounded-3xl p-4 shadow-luxe space-y-3.5 max-h-[78vh] flex flex-col border border-white/10">
             <!-- Header -->
             <div class="flex items-center justify-between pb-2 border-b border-white/10 flex-none">
-                <div class="flex items-center gap-2">
-                    <div class="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-xs">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-xl bg-gold-500/20 text-gold-400 border border-gold-500/30 flex items-center justify-center text-xs shadow-gold-glow">
                         <i class="fa-solid fa-crown"></i>
                     </div>
                     <div>
-                        <h3 class="text-xs font-black tracking-wide text-white uppercase font-mono">SEÇKİN BURSA KOLEKSİYONU</h3>
-                        <span class="text-[10px] text-slate-400">Doğa, Tarih, Sahil ve Asırlık Lezzetler</span>
+                        <h3 class="text-xs font-display font-bold tracking-widest text-white uppercase">SEÇKİN KOLEKSİYONLAR</h3>
+                        <span class="text-[10px] text-slate-400 font-mono">Bursa'nın En İkonik Noktaları</span>
                     </div>
                 </div>
                 <button onclick="closeActiveSheet()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition">
@@ -433,44 +419,44 @@
                 </button>
             </div>
 
-            <!-- Search & Filter Chips -->
+            <!-- Search & Filters -->
             <div class="space-y-2 flex-none">
                 <div class="relative">
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-2.5 text-slate-400 text-xs"></i>
                     <input type="text" id="place-search-input" onkeyup="filterPlaces()" placeholder="Mekan veya deneyim ara..." 
-                           class="w-full bg-black/40 border border-white/10 text-white placeholder-slate-400 text-xs pl-9 pr-3.5 py-2 rounded-xl outline-none focus:border-amber-400 transition">
+                           class="w-full bg-black/40 border border-white/10 text-white placeholder-slate-400 text-xs pl-9 pr-3.5 py-2 rounded-xl outline-none focus:border-gold-400 transition">
                 </div>
 
                 <div class="flex gap-1.5 overflow-x-auto pb-1 custom-scrollbar text-[10px] font-mono">
-                    <button onclick="setCategory('all')" class="cat-filter-btn active-cat px-3 py-1 rounded-full font-bold whitespace-nowrap bg-emerald-500 text-slate-950 shadow-glow-emerald" data-cat="all">TÜMÜ</button>
-                    <button onclick="setCategory('doga')" class="cat-filter-btn px-3 py-1 rounded-full font-semibold whitespace-nowrap bg-white/5 text-slate-300 border border-white/10 hover:border-emerald-400" data-cat="doga">🌿 DOĞA & GÖL</button>
-                    <button onclick="setCategory('tarih')" class="cat-filter-btn px-3 py-1 rounded-full font-semibold whitespace-nowrap bg-white/5 text-slate-300 border border-white/10 hover:border-amber-400" data-cat="tarih">👑 TARİH</button>
-                    <button onclick="setCategory('adrenalin')" class="cat-filter-btn px-3 py-1 rounded-full font-semibold whitespace-nowrap bg-white/5 text-slate-300 border border-white/10 hover:border-sky-400" data-cat="adrenalin">⚡ MACERA</button>
-                    <button onclick="setCategory('sahil')" class="cat-filter-btn px-3 py-1 rounded-full font-semibold whitespace-nowrap bg-white/5 text-slate-300 border border-white/10 hover:border-cyan-400" data-cat="sahil">⚓ SAHİL</button>
-                    <button onclick="setCategory('lezzet')" class="cat-filter-btn px-3 py-1 rounded-full font-semibold whitespace-nowrap bg-white/5 text-slate-300 border border-white/10 hover:border-rose-400" data-cat="lezzet">🥩 GURME</button>
+                    <button onclick="setCategory('all')" class="cat-filter-btn active-cat px-3 py-1 rounded-full font-bold whitespace-nowrap bg-gradient-to-r from-gold-600 to-amber-500 text-slate-950 shadow-gold-glow" data-cat="all">TÜMÜ</button>
+                    <button onclick="setCategory('doga')" class="cat-filter-btn px-3 py-1 rounded-full font-semibold whitespace-nowrap bg-white/5 text-slate-300 border border-white/10 hover:border-gold-400" data-cat="doga">🌿 DOĞA</button>
+                    <button onclick="setCategory('tarih')" class="cat-filter-btn px-3 py-1 rounded-full font-semibold whitespace-nowrap bg-white/5 text-slate-300 border border-white/10 hover:border-gold-400" data-cat="tarih">👑 TARİH</button>
+                    <button onclick="setCategory('adrenalin')" class="cat-filter-btn px-3 py-1 rounded-full font-semibold whitespace-nowrap bg-white/5 text-slate-300 border border-white/10 hover:border-gold-400" data-cat="adrenalin">⚡ MACERA</button>
+                    <button onclick="setCategory('sahil')" class="cat-filter-btn px-3 py-1 rounded-full font-semibold whitespace-nowrap bg-white/5 text-slate-300 border border-white/10 hover:border-gold-400" data-cat="sahil">⚓ SAHİL</button>
+                    <button onclick="setCategory('lezzet')" class="cat-filter-btn px-3 py-1 rounded-full font-semibold whitespace-nowrap bg-white/5 text-slate-300 border border-white/10 hover:border-gold-400" data-cat="lezzet">🥩 GURME</button>
                 </div>
             </div>
 
             <!-- Places Cards List -->
-            <div id="places-container" class="overflow-y-auto space-y-2.5 custom-scrollbar pr-1 flex-1">
-                <!-- Injected via JavaScript -->
+            <div id="places-container" class="overflow-y-auto space-y-3 custom-scrollbar pr-1 flex-1">
+                <!-- Injected via JavaScript with Photos -->
             </div>
         </div>
     </div>
 
-    <!-- PANEL D: BURULAŞ RESMİ UYDU RADARI (EMBEDDED RADAR) -->
-    <div id="sheet-official-burulas" class="absolute inset-x-3 bottom-24 top-20 md:inset-auto md:bottom-28 md:left-6 md:w-[540px] md:h-[650px] z-20 hidden transition-all duration-300">
-        <div class="elite-glass rounded-3xl p-4 shadow-elite flex flex-col h-full border border-white/10">
+    <!-- PANEL 4: BURULAŞ RESMİ UYDU RADARI -->
+    <div id="sheet-official-burulas" class="absolute inset-x-3 bottom-24 top-20 md:inset-auto md:bottom-28 md:left-6 md:w-[560px] md:h-[660px] z-20 hidden transition-all duration-300">
+        <div class="luxe-glass rounded-3xl p-4 shadow-luxe flex flex-col h-full border border-white/10">
             <div class="flex items-center justify-between pb-2.5 border-b border-white/10 flex-none">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2.5">
                     <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
                     <div>
-                        <h3 class="text-xs font-black tracking-wide text-white uppercase font-mono">BURULAŞ RESMİ UYDU PORTALI</h3>
-                        <span class="text-[10px] text-slate-400">Canlı Belediye Filo Telemetrisi</span>
+                        <h3 class="text-xs font-display font-bold tracking-widest text-white uppercase">BURULAŞ RESMİ UYDU PORTALI</h3>
+                        <span class="text-[10px] text-slate-400 font-mono">Bursa Büyükşehir Belediyesi Canlı Filosu</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <a href="https://bus.burulas.com.tr" target="_blank" rel="noopener noreferrer" class="text-xs text-cyan-400 hover:underline flex items-center gap-1 font-mono font-bold">
+                    <a href="https://bus.burulas.com.tr" target="_blank" rel="noopener noreferrer" class="text-xs text-gold-400 hover:underline flex items-center gap-1 font-mono font-bold">
                         Tam Ekran <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
                     </a>
                     <button onclick="closeActiveSheet()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition">
@@ -485,15 +471,15 @@
     </div>
 
     <!-- ========================================================================= -->
-    <!-- 3. LIVE VEHICLE TELEMETRY COCKPIT (HUD) -->
+    <!-- 3. LIVE VEHICLE TELEMETRY COCKPIT (HUD)                                   -->
     <!-- ========================================================================= -->
-    <div id="bus-live-cockpit" class="absolute top-16 left-3 right-3 md:left-6 md:right-auto md:w-[420px] elite-glass p-4 rounded-3xl shadow-elite z-20 hidden transition-all duration-300 border border-emerald-500/30">
+    <div id="bus-live-cockpit" class="absolute top-16 left-3 right-3 md:left-6 md:right-auto md:w-[420px] luxe-glass p-4 rounded-3xl shadow-luxe z-20 hidden transition-all duration-300 border border-gold-500/30">
         <div class="flex items-center justify-between pb-2 border-b border-white/10">
             <div class="flex items-center space-x-2.5">
-                <span id="cockpit-badge" class="bg-emerald-600 text-white font-mono font-black text-xs px-2.5 py-1 rounded-xl shadow-glow-emerald">5/G</span>
+                <span id="cockpit-badge" class="bg-gradient-to-r from-gold-600 to-amber-500 text-slate-950 font-mono font-black text-xs px-2.5 py-1 rounded-xl shadow-gold-glow">5/G</span>
                 <div>
-                    <h4 id="cockpit-title" class="text-xs font-black text-white leading-tight">Gölyazı Ekspres</h4>
-                    <span id="cockpit-plate" class="text-[10px] text-slate-400 font-mono">16 M 0482 (Burulaş Filo)</span>
+                    <h4 id="cockpit-title" class="text-xs font-bold text-white leading-tight font-display">Gölyazı Ekspres</h4>
+                    <span id="cockpit-plate" class="text-[10px] text-slate-400 font-mono">16 M 0482 (Burulaş VIP Filo)</span>
                 </div>
             </div>
             <button onclick="closeBusLiveCockpit()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition">
@@ -518,22 +504,22 @@
 
         <div class="pt-2">
             <a id="cockpit-burulas-link" href="https://bus.burulas.com.tr" target="_blank" rel="noopener noreferrer" 
-               class="w-full bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white py-2.5 px-3 rounded-2xl text-xs font-black font-mono shadow-glow-emerald flex items-center justify-center gap-2 transition active:scale-95">
-                <i class="fa-solid fa-satellite-dish animate-pulse"></i> BURULAŞ UYDUSUNDA AÇ
+               class="w-full bg-gradient-to-r from-gold-500 to-amber-500 hover:from-gold-400 hover:to-amber-400 text-slate-950 py-2.5 px-3 rounded-2xl text-xs font-black font-mono shadow-gold-glow flex items-center justify-center gap-2 transition active:scale-95">
+                <i class="fa-solid fa-satellite-dish"></i> BURULAŞ RESMİ UYDUSUNDA AÇ
             </a>
         </div>
     </div>
 
     <!-- ========================================================================= -->
-    <!-- 4. FLOATING PLACE DETAIL OVERLAY (CARD INSPECTOR) -->
+    <!-- 4. FLOATING PLACE DETAIL OVERLAY (CARD INSPECTOR)                         -->
     <!-- ========================================================================= -->
-    <div id="floating-place-card" class="absolute bottom-24 md:bottom-28 left-3 right-3 md:left-6 md:right-auto md:w-[420px] elite-glass p-4 rounded-3xl shadow-elite z-20 hidden transition-all duration-300 border border-amber-500/30">
+    <div id="floating-place-card" class="absolute bottom-24 md:bottom-28 left-3 right-3 md:left-6 md:right-auto md:w-[420px] luxe-glass p-4 rounded-3xl shadow-luxe z-20 hidden transition-all duration-300 border border-gold-500/40">
         <div class="flex items-start justify-between">
             <div class="flex items-center space-x-2.5">
                 <span id="card-icon" class="text-3xl">🌅</span>
                 <div>
-                    <h3 id="card-title" class="text-xs font-black text-white leading-tight">Gölyazı</h3>
-                    <span id="card-category" class="text-[10px] text-amber-400 font-bold font-mono uppercase tracking-wider">Göl & Ada</span>
+                    <h3 id="card-title" class="text-xs font-display font-bold text-white leading-tight">Gölyazı</h3>
+                    <span id="card-category" class="text-[10px] text-gold-400 font-bold font-mono uppercase tracking-wider">Göl & Ada</span>
                 </div>
             </div>
             <button onclick="closeFloatingPlaceCard()" class="text-slate-400 hover:text-white p-1">
@@ -542,50 +528,50 @@
         </div>
         <p id="card-desc" class="text-[11px] text-slate-300 mt-2.5 mb-3 leading-relaxed"></p>
         <div class="flex gap-2">
-            <button onclick="routeToSelectedPlace()" class="flex-1 bg-gradient-to-r from-emerald-600 to-teal-500 text-white py-2.5 rounded-2xl text-xs font-bold font-mono shadow-glow-emerald flex items-center justify-center gap-2 active:scale-95 transition">
+            <button onclick="routeToSelectedPlace()" class="flex-1 bg-gradient-to-r from-gold-500 to-amber-500 text-slate-950 py-2.5 rounded-2xl text-xs font-black font-mono shadow-gold-glow flex items-center justify-center gap-2 active:scale-95 transition">
                 <i class="fa-solid fa-diamond-turn-right"></i> BURAYA ROTA ÇİZ
             </button>
         </div>
     </div>
 
     <!-- MAP CLICK INDICATOR OVERLAY -->
-    <div id="map-click-indicator" class="absolute top-16 left-1/2 transform -translate-x-1/2 elite-glass px-4 py-2 rounded-full shadow-elite border border-emerald-500/50 z-20 text-xs font-mono font-bold hidden flex items-center gap-2 text-white">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+    <div id="map-click-indicator" class="absolute top-16 left-1/2 transform -translate-x-1/2 luxe-glass px-4 py-2 rounded-full shadow-luxe border border-gold-500/50 z-20 text-xs font-mono font-bold hidden flex items-center gap-2 text-white">
+        <span class="w-2 h-2 rounded-full bg-gold-400 animate-ping"></span>
         <span id="map-click-text">Haritadan başlangıç noktası seçin</span>
         <button onclick="toggleMapClickMode()" class="text-slate-400 hover:text-white ml-2"><i class="fa-solid fa-xmark"></i></button>
     </div>
 
     <!-- ========================================================================= -->
-    <!-- 5. FLOATING BESPOKE COMMAND DOCK (TESLA / MAC OS GLASS DOCK) -->
+    <!-- 5. FLOATING VIP COMMAND DOCK (AEROSPACE GLASS DOCK)                       -->
     <!-- ========================================================================= -->
     <nav class="absolute bottom-4 inset-x-0 z-30 flex justify-center px-3 safe-bottom pointer-events-none">
-        <div class="pointer-events-auto elite-glass p-1.5 rounded-full flex items-center gap-1.5 shadow-dock border border-white/10 transition-all duration-300">
-            <!-- Dock Item 1: Rota Asistanı -->
-            <button onclick="toggleSheet('ab-route')" id="dock-btn-ab-route" title="Akıllı Rota"
-                    class="px-3.5 py-2.5 rounded-full text-slate-400 hover:text-white flex items-center gap-2 text-xs font-bold transition-all active:scale-90">
-                <i class="fa-solid fa-diamond-turn-right text-emerald-400 text-sm"></i>
-                <span class="hidden sm:inline font-mono">ROTA</span>
+        <div class="pointer-events-auto luxe-glass p-1.5 rounded-full flex items-center gap-1.5 shadow-luxe border border-white/10 transition-all duration-300">
+            <!-- Dock Item 1: Rota -->
+            <button onclick="toggleSheet('ab-route')" id="dock-btn-ab-route" title="Akıllı Güzergah"
+                    class="px-4 py-2.5 rounded-full text-slate-400 hover:text-white flex items-center gap-2 text-xs font-bold transition-all active:scale-90">
+                <i class="fa-solid fa-diamond-turn-right text-gold-400 text-sm"></i>
+                <span class="hidden sm:inline font-display tracking-wider">ROTA</span>
             </button>
 
-            <!-- Dock Item 2: Kaç Dk? Canlı Varış -->
+            <!-- Dock Item 2: Kaç Dk? -->
             <button onclick="toggleSheet('live-eta')" id="dock-btn-live-eta" title="Otobüsüm Kaç Dk Sonra Gelecek?"
-                    class="px-3.5 py-2.5 rounded-full text-slate-400 hover:text-white flex items-center gap-2 text-xs font-bold transition-all active:scale-90">
-                <i class="fa-solid fa-stopwatch text-amber-400 text-sm"></i>
-                <span class="hidden sm:inline font-mono">KAÇ DK?</span>
+                    class="px-4 py-2.5 rounded-full text-slate-400 hover:text-white flex items-center gap-2 text-xs font-bold transition-all active:scale-90">
+                <i class="fa-solid fa-stopwatch text-emerald-400 text-sm"></i>
+                <span class="hidden sm:inline font-display tracking-wider">VARIŞLAR</span>
             </button>
 
-            <!-- Dock Item 3: Geziler Koleksiyonu -->
-            <button onclick="toggleSheet('places')" id="dock-btn-places" title="Seçkin Geziler"
-                    class="px-3.5 py-2.5 rounded-full text-slate-400 hover:text-white flex items-center gap-2 text-xs font-bold transition-all active:scale-90">
-                <i class="fa-solid fa-compass text-sky-400 text-sm"></i>
-                <span class="hidden sm:inline font-mono">GEZİLER</span>
+            <!-- Dock Item 3: Geziler -->
+            <button onclick="toggleSheet('places')" id="dock-btn-places" title="Seçkin Koleksiyon"
+                    class="px-4 py-2.5 rounded-full text-slate-400 hover:text-white flex items-center gap-2 text-xs font-bold transition-all active:scale-90">
+                <i class="fa-solid fa-crown text-amber-300 text-sm"></i>
+                <span class="hidden sm:inline font-display tracking-wider">KEŞİF</span>
             </button>
 
             <!-- Dock Item 4: Burulaş Radar -->
             <button onclick="toggleSheet('official-burulas')" id="dock-btn-official-burulas" title="Burulaş Uydu Radarı"
-                    class="px-3.5 py-2.5 rounded-full text-slate-400 hover:text-white flex items-center gap-2 text-xs font-bold transition-all active:scale-90">
+                    class="px-4 py-2.5 rounded-full text-slate-400 hover:text-white flex items-center gap-2 text-xs font-bold transition-all active:scale-90">
                 <i class="fa-solid fa-satellite-dish text-cyan-400 text-sm"></i>
-                <span class="hidden sm:inline font-mono">RADAR</span>
+                <span class="hidden sm:inline font-display tracking-wider">RADAR</span>
             </button>
         </div>
     </nav>

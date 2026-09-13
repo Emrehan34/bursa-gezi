@@ -273,6 +273,7 @@ const BUS_LINES_DATA = [
 const PLACES_DATA = [
     {
         id: "place-golyazi",
+        imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=700&auto=format&fit=crop&q=80",
         name: "Gölyazı Köyü (Uluabat Gölü & Ağlayan Çınar)",
         category: "doga",
         categoryName: "Göl & Ada",
@@ -295,6 +296,7 @@ const PLACES_DATA = [
     },
     {
         id: "place-cumalikizik",
+        imageUrl: "https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?w=700&auto=format&fit=crop&q=80",
         name: "Cumalıkızık Köyü (UNESCO Mirası)",
         category: "tarih",
         categoryName: "Tarihi Köy",
@@ -317,6 +319,7 @@ const PLACES_DATA = [
     },
     {
         id: "place-mudanya-kordon",
+        imageUrl: "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=700&auto=format&fit=crop&q=80",
         name: "Mudanya Mütareke Evi & Kordon",
         category: "sahil",
         categoryName: "Sahil & Kordon",
@@ -339,6 +342,7 @@ const PLACES_DATA = [
     },
     {
         id: "place-tirilye",
+        imageUrl: "https://images.unsplash.com/photo-1519451241324-20b4ea2c4220?w=700&auto=format&fit=crop&q=80",
         name: "Trilye (Zeytinbağı & Taş Mektep)",
         category: "sahil",
         categoryName: "Sahil Kasabası",
@@ -361,6 +365,7 @@ const PLACES_DATA = [
     },
     {
         id: "place-orhaneli-rafting",
+        imageUrl: "https://images.unsplash.com/photo-1530866495561-507c9faab2ed?w=700&auto=format&fit=crop&q=80",
         name: "Orhaneli Kocasu Rafting Parkuru",
         category: "adrenalin",
         categoryName: "Rafting",
@@ -383,6 +388,7 @@ const PLACES_DATA = [
     },
     {
         id: "place-nefes-dagyenice",
+        imageUrl: "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=700&auto=format&fit=crop&q=80",
         name: "Nefes Dağyenice Macera Parkı",
         category: "adrenalin",
         categoryName: "Macera Parkı",
@@ -405,6 +411,7 @@ const PLACES_DATA = [
     },
     {
         id: "place-ulu-cami",
+        imageUrl: "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=700&auto=format&fit=crop&q=80",
         name: "Bursa Ulu Camii & Kapalı Çarşı",
         category: "tarih",
         categoryName: "Tarihi Cami",
@@ -426,6 +433,7 @@ const PLACES_DATA = [
     },
     {
         id: "place-koza-han",
+        imageUrl: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=700&auto=format&fit=crop&q=80",
         name: "Koza Han (Közde Türk Kahvesi)",
         category: "tarih",
         categoryName: "Tarihi Han",
@@ -447,6 +455,7 @@ const PLACES_DATA = [
     },
     {
         id: "place-tophane",
+        imageUrl: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=700&auto=format&fit=crop&q=80",
         name: "Tophane Saat Kulesi & Türbeler",
         category: "tarih",
         categoryName: "Seyir Terası",
@@ -468,6 +477,7 @@ const PLACES_DATA = [
     },
     {
         id: "place-teleferik",
+        imageUrl: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=700&auto=format&fit=crop&q=80",
         name: "Bursa Teleferik & Uludağ",
         category: "doga",
         categoryName: "Teleferik",
@@ -490,6 +500,7 @@ const PLACES_DATA = [
     },
     {
         id: "place-saitabat",
+        imageUrl: "https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=700&auto=format&fit=crop&q=80",
         name: "Saitabat Şelalesi & Derekızık",
         category: "doga",
         categoryName: "Şelale",
@@ -512,6 +523,7 @@ const PLACES_DATA = [
     },
     {
         id: "place-suuctu",
+        imageUrl: "https://images.unsplash.com/photo-1448375240586-882707db888b?w=700&auto=format&fit=crop&q=80",
         name: "Suuçtu Şelalesi Tabiat Parkı",
         category: "doga",
         categoryName: "Şelale",
@@ -534,6 +546,7 @@ const PLACES_DATA = [
     },
     {
         id: "place-iskender-tarihi",
+        imageUrl: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=700&auto=format&fit=crop&q=80",
         name: "Tarihi Kebapçı İskender (Mavi Dükkan)",
         category: "lezzet",
         categoryName: "Gastronomi",
@@ -555,6 +568,7 @@ const PLACES_DATA = [
     },
     {
         id: "place-kayhan-kofte",
+        imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947?w=700&auto=format&fit=crop&q=80",
         name: "Tarihi Kayhan Çarşısı (Pideli Köfte)",
         category: "lezzet",
         categoryName: "Gastronomi",
@@ -741,7 +755,7 @@ function renderLiveBusDepartureBoard(query = "") {
     filtered.forEach(line => {
         const eta = calculateBusEtaForLine(line.intervalMin || 15);
         const card = document.createElement("div");
-        card.className = "bg-black/40 hover:bg-black/60 border border-white/10 hover:border-emerald-500/50 p-3.5 rounded-2xl shadow-elite transition-all duration-200 cursor-pointer flex flex-col gap-2.5 group";
+        card.className = "luxe-card p-3.5 rounded-2xl shadow-luxe transition-all duration-300 cursor-pointer flex flex-col gap-2.5 group border border-white/10 hover:border-gold-500/40 bg-[#0b0e15]";
         card.setAttribute("data-line-id", line.id);
         card.setAttribute("data-interval", line.intervalMin || 15);
 
@@ -749,9 +763,9 @@ function renderLiveBusDepartureBoard(query = "") {
         let statusDot = "bg-emerald-400 animate-ping";
         let statusText = "Durağa Yanaşıyor";
         if (eta.mins > 8) {
-            badgeClass = "bg-amber-500/20 text-amber-400 border border-amber-500/40";
-            statusDot = "bg-amber-400";
-            statusText = `Yolda (${Math.max(1, Math.round(eta.mins / 3))} durak geride)`;
+            badgeClass = "bg-gold-500/20 text-gold-400 border border-gold-500/40";
+            statusDot = "bg-gold-400";
+            statusText = `Seyir Halinde (${Math.max(1, Math.round(eta.mins / 3))} durak geride)`;
         } else if (eta.mins > 2) {
             badgeClass = "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
             statusDot = "bg-emerald-400";
@@ -764,32 +778,32 @@ function renderLiveBusDepartureBoard(query = "") {
         card.innerHTML = `
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-2.5">
-                    <span style="background-color: ${line.color};" class="px-2.5 py-1 rounded-xl font-mono font-black text-white text-xs shadow-glow-emerald">
+                    <span style="background-color: ${line.color};" class="px-2.5 py-1 rounded-xl font-mono font-black text-white text-xs shadow-gold-glow">
                         ${line.code}
                     </span>
                     <div>
-                        <h4 class="text-xs font-black text-white leading-tight group-hover:text-emerald-400 transition">${line.name}</h4>
+                        <h4 class="text-xs font-display font-bold text-white leading-tight group-hover:text-gold-300 transition">${line.name}</h4>
                         <span class="text-[10px] text-slate-400 font-mono">${line.type} • ${line.frequency}</span>
                     </div>
                 </div>
                 <div class="text-right flex flex-col items-end">
-                    <span class="text-sm font-black font-mono text-emerald-400 eta-countdown-val tracking-tight" data-line="${line.id}">
+                    <span class="text-base font-black font-mono text-gold-400 eta-countdown-val tracking-tight" data-line="${line.id}">
                         ${eta.mins} dk ${eta.secs}s
                     </span>
-                    <span class="text-[9px] text-slate-400 font-mono">sonra varış</span>
+                    <span class="text-[9px] text-slate-400 font-mono">kalan süre</span>
                 </div>
             </div>
 
-            <div class="flex items-center justify-between pt-1.5 border-t border-white/5 text-[10px]">
+            <div class="flex items-center justify-between pt-2 border-t border-white/5 text-[10px]">
                 <div class="flex items-center gap-1.5 ${badgeClass} px-2 py-0.5 rounded-lg font-mono font-semibold">
                     <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>
                     <span>${statusText}</span>
                 </div>
                 <div class="flex items-center gap-2 text-slate-400 font-mono text-[10px]">
-                    <span><i class="fa-solid fa-gauge-high text-slate-500"></i> ${mockSpeed} km/s</span>
-                    <span><i class="fa-solid fa-users text-slate-500"></i> %${mockOccupancy}</span>
-                    <span class="text-emerald-400 font-bold ml-1 flex items-center gap-1 group-hover:underline">
-                        İzle <i class="fa-solid fa-arrow-right text-[9px]"></i>
+                    <span><i class="fa-solid fa-gauge-high text-gold-400/80"></i> ${mockSpeed} km/s</span>
+                    <span><i class="fa-solid fa-users text-gold-400/80"></i> %${mockOccupancy}</span>
+                    <span class="text-gold-400 font-bold ml-1 flex items-center gap-1 group-hover:underline">
+                        Haritada İzle <i class="fa-solid fa-arrow-right text-[9px]"></i>
                     </span>
                 </div>
             </div>
@@ -859,7 +873,7 @@ function renderPlacesList(filterQuery = "") {
     filtered.forEach(place => {
         const distKm = calculateDistance(userCoords.lat, userCoords.lng, place.lat, place.lng);
         const card = document.createElement("div");
-        card.className = "bg-black/40 hover:bg-black/60 border border-white/10 hover:border-amber-500/40 p-3.5 rounded-2xl shadow-elite transition-all duration-200 space-y-2.5 group";
+        card.className = "luxe-card rounded-2xl overflow-hidden shadow-luxe flex flex-col group border border-white/10 hover:border-gold-500/40 transition-all duration-300 bg-[#0b0e15]";
         
         let chainHtml = "";
         if (place.transitChain) {
@@ -871,30 +885,42 @@ function renderPlacesList(filterQuery = "") {
             chainHtml += '</div>';
         }
 
+        const fallbackImg = "https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?w=600&auto=format&fit=crop&q=80";
+        const coverImg = place.imageUrl || fallbackImg;
+
         card.innerHTML = `
-            <div class="flex items-start justify-between">
-                <div class="flex items-center space-x-2.5">
-                    <span class="text-2xl">${place.icon}</span>
-                    <div>
-                        <h4 class="text-xs font-black text-white leading-tight group-hover:text-amber-400 transition">${place.name}</h4>
-                        <div class="flex items-center gap-1.5 text-[10px] text-slate-400 font-mono mt-0.5">
-                            <span class="text-amber-400/90 uppercase font-semibold">${place.categoryName}</span>
-                            <span>•</span>
-                            <span class="text-emerald-400 font-bold font-mono">${distKm.toFixed(1)} km mesafede</span>
-                        </div>
-                    </div>
+            <div class="h-28 w-full relative overflow-hidden bg-slate-950">
+                <img src="${coverImg}" 
+                     alt="${place.name}" 
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-75"
+                     onerror="this.src='${fallbackImg}'">
+                <div class="absolute inset-0 bg-gradient-to-t from-[#0b0e15] via-[#0b0e15]/40 to-transparent"></div>
+                
+                <div class="absolute top-2.5 inset-x-2.5 flex items-center justify-between text-[10px] font-mono">
+                    <span class="px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-gold-400 font-bold border border-gold-500/30 uppercase tracking-wider">
+                        ${place.categoryName}
+                    </span>
+                    <span class="px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-emerald-400 font-bold border border-emerald-500/30">
+                        <i class="fa-solid fa-location-arrow text-[9px] mr-1"></i>${distKm.toFixed(1)} km
+                    </span>
                 </div>
-                <span class="bg-white/5 border border-white/10 text-cyan-300 text-[10px] font-bold px-2 py-0.5 rounded-full font-mono">${place.busCode || 'Ulaşım'}</span>
+
+                <div class="absolute bottom-2 inset-x-3">
+                    <h4 class="text-xs font-display font-bold text-white leading-tight drop-shadow truncate group-hover:text-gold-300 transition">${place.name}</h4>
+                </div>
             </div>
-            <p class="text-[11px] text-slate-300 leading-relaxed line-clamp-2">${place.desc}</p>
-            ${chainHtml}
-            <div class="flex gap-2 pt-1 border-t border-white/5">
-                <button onclick="setDestinationAndRoute('${place.id}')" class="flex-1 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white py-2 rounded-xl text-xs font-black font-mono shadow-glow-emerald flex items-center justify-center gap-1.5 transition active:scale-95">
-                    <i class="fa-solid fa-diamond-turn-right"></i> Rota Çiz
-                </button>
-                <button onclick="focusPlaceOnMap('${place.id}')" class="bg-white/5 hover:bg-white/15 text-slate-300 px-3 py-2 rounded-xl text-xs font-bold border border-white/10 transition">
-                    <i class="fa-solid fa-location-dot text-emerald-400"></i>
-                </button>
+
+            <div class="p-3 space-y-2.5 bg-[#0b0e15]">
+                <p class="text-[11px] text-slate-300 leading-relaxed line-clamp-2">${place.desc}</p>
+                ${chainHtml}
+                <div class="flex gap-2 pt-1 border-t border-white/5">
+                    <button onclick="setDestinationAndRoute('${place.id}')" class="flex-1 bg-gradient-to-r from-gold-600 via-gold-500 to-amber-500 hover:from-gold-500 hover:to-amber-400 text-slate-950 py-2 rounded-xl text-xs font-display font-black tracking-wider uppercase shadow-gold-glow flex items-center justify-center gap-1.5 transition active:scale-95">
+                        <i class="fa-solid fa-diamond-turn-right text-[10px]"></i> Rota Çiz
+                    </button>
+                    <button onclick="focusPlaceOnMap('${place.id}')" title="Haritada İncele" class="bg-white/5 hover:bg-white/15 text-slate-300 px-3 py-2 rounded-xl text-xs font-bold border border-white/10 transition">
+                        <i class="fa-solid fa-location-dot text-gold-400"></i>
+                    </button>
+                </div>
             </div>
         `;
         container.appendChild(card);
@@ -1438,27 +1464,27 @@ function renderABRouteDirections(pA, pB, distKm, durationMins, steps) {
     if (!container) return;
 
     container.innerHTML = `
-        <div class="bg-white dark:bg-slate-800/95 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700/60 shadow-md space-y-3 text-xs">
-            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-2.5">
+        <div class="luxe-card p-4 rounded-2xl border border-white/10 shadow-luxe space-y-3 text-xs bg-[#0b0e15]">
+            <div class="flex items-center justify-between border-b border-white/5 pb-2.5">
                 <div>
-                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Tahmini Seyahat</span>
-                    <b class="text-emerald-600 dark:text-emerald-400 text-base font-black">${durationMins} Dakika</b>
+                    <span class="text-[10px] text-slate-400 font-mono font-bold uppercase tracking-wider block">Tahmini Seyahat</span>
+                    <b class="text-gold-400 text-base font-display font-black tracking-wide">${durationMins} Dakika</b>
                 </div>
                 <div class="text-right">
-                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Mesafe</span>
-                    <b class="text-slate-800 dark:text-white text-xs font-mono font-bold">${distKm.toFixed(1)} km</b>
+                    <span class="text-[10px] text-slate-400 font-mono font-bold uppercase tracking-wider block">Mesafe</span>
+                    <b class="text-white text-xs font-mono font-bold">${distKm.toFixed(1)} km</b>
                 </div>
             </div>
 
-            <div class="space-y-2 text-[11px]">
+            <div class="space-y-2 text-[11px] font-mono">
                 <div class="flex items-center gap-2">
-                    <span class="w-3 h-3 rounded-full bg-emerald-500 flex items-center justify-center text-white text-[8px] font-bold">A</span>
-                    <span class="font-bold text-slate-800 dark:text-slate-200 truncate">Başlangıç: ${pA.name}</span>
+                    <span class="w-3 h-3 rounded-full bg-emerald-500 flex items-center justify-center text-slate-950 text-[8px] font-black">A</span>
+                    <span class="font-bold text-white truncate">Başlangıç: ${pA.name}</span>
                 </div>
-                <div class="w-0.5 h-3 bg-slate-300 dark:bg-slate-600 ml-1.5"></div>
+                <div class="w-0.5 h-3 bg-white/20 ml-1.5"></div>
                 <div class="flex items-center gap-2">
-                    <span class="w-3 h-3 rounded-full bg-rose-500 flex items-center justify-center text-white text-[8px] font-bold">B</span>
-                    <span class="font-bold text-slate-800 dark:text-slate-200 truncate">Hedef: ${pB.name}</span>
+                    <span class="w-3 h-3 rounded-full bg-rose-500 flex items-center justify-center text-white text-[8px] font-black">B</span>
+                    <span class="font-bold text-white truncate">Hedef: ${pB.name}</span>
                 </div>
             </div>
         </div>
@@ -1468,22 +1494,22 @@ function renderABRouteDirections(pA, pB, distKm, durationMins, steps) {
     const matchedPlace = PLACES_DATA.find(p => p.name === pB.name || p.id === pB.id);
     if (matchedPlace && matchedPlace.transitChain) {
         const transitCard = document.createElement("div");
-        transitCard.className = "bg-white dark:bg-slate-800/95 p-4 rounded-2xl border border-blue-200/80 dark:border-blue-800/60 shadow-md space-y-2.5 text-xs";
+        transitCard.className = "luxe-card p-4 rounded-2xl border border-gold-500/30 shadow-luxe space-y-2.5 text-xs bg-[#0b0e15]";
         
-        let chainHtml = '<div class="flex items-center gap-1.5 overflow-x-auto py-1 custom-scrollbar text-[10px]">';
+        let chainHtml = '<div class="flex items-center gap-1.5 overflow-x-auto py-1 custom-scrollbar text-[10px] font-mono">';
         matchedPlace.transitChain.forEach((st, i) => {
-            chainHtml += `<span class="px-2 py-0.5 rounded-lg ${st.color || 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200'} whitespace-nowrap font-semibold">${st.badge ? `<b class="mr-1 font-mono">${st.badge}</b>` : ''}${st.text}</span>`;
-            if (i < matchedPlace.transitChain.length - 1) chainHtml += `<i class="fa-solid fa-angle-right text-slate-300 dark:text-slate-600 text-[9px]"></i>`;
+            chainHtml += `<span class="px-2 py-0.5 rounded-lg ${st.color || 'bg-white/10 text-white'} whitespace-nowrap font-semibold">${st.badge ? `<b class="mr-1">${st.badge}</b>` : ''}${st.text}</span>`;
+            if (i < matchedPlace.transitChain.length - 1) chainHtml += `<i class="fa-solid fa-angle-right text-slate-500 text-[9px]"></i>`;
         });
         chainHtml += '</div>';
 
         transitCard.innerHTML = `
-            <div class="flex items-center gap-1.5 text-slate-900 dark:text-white font-black text-xs">
-                <i class="fa-solid fa-bus text-blue-600 dark:text-blue-400"></i>
+            <div class="flex items-center gap-1.5 text-white font-display font-bold text-xs">
+                <i class="fa-solid fa-bus text-gold-400"></i>
                 <span>Önerilen Toplu Taşıma Aktarma Planı:</span>
             </div>
             ${chainHtml}
-            <p class="text-[11px] text-slate-600 dark:text-slate-300 pt-1 leading-relaxed">${matchedPlace.transit}</p>
+            <p class="text-[11px] text-slate-300 pt-1 leading-relaxed">${matchedPlace.transit}</p>
         `;
         container.appendChild(transitCard);
     }
