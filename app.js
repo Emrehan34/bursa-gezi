@@ -676,38 +676,42 @@ function toggleDarkMode() {
     }
 }
 
-// 5. SEKME YÖNETİMİ (TAB SWITCHER)
-function switchAppTab(tabId) {
-    const panels = ['ab-route', 'live-eta', 'places', 'official-burulas'];
-    panels.forEach(p => {
-        const el = document.getElementById(`panel-${p}`);
-        const btn = document.getElementById(`tab-btn-${p}`);
-        if (el) el.classList.add('hidden');
-        if (btn) {
-            btn.classList.remove('tab-btn-active');
-            btn.classList.add('text-slate-600', 'dark:text-slate-400');
-        }
-    });
+// 5. SEÇKİN MODÜLER PANEL & DOCK YÖNETİMİ (FLOATING MODULAR HUD)
+let activeSheetId = null;
 
-    const activePanel = document.getElementById(`panel-${tabId}`);
-    const activeBtn = document.getElementById(`tab-btn-${tabId}`);
-    if (activePanel) activePanel.classList.remove('hidden');
-    if (activeBtn) {
-        activeBtn.classList.add('tab-btn-active');
-        activeBtn.classList.remove('text-slate-600', 'dark:text-slate-400');
+function toggleSheet(sheetId) {
+    if ('vibrate' in navigator) {
+        try { navigator.vibrate(15); } catch(e) {}
+    }
+
+    const targetSheet = document.getElementById(`sheet-${sheetId}`);
+    const dockBtn = document.getElementById(`dock-btn-${sheetId}`);
+
+    if (activeSheetId === sheetId) {
+        closeActiveSheet();
+        return;
+    }
+
+    // Açık olanı kapat
+    closeActiveSheet();
+
+    if (targetSheet) {
+        targetSheet.classList.remove('hidden');
+        activeSheetId = sheetId;
+    }
+    if (dockBtn) {
+        dockBtn.classList.add('dock-item-active');
     }
 }
 
-function toggleMobileDrawer() {
-    const drawer = document.getElementById("main-drawer");
-    if (!drawer) return;
-    isMobileDrawerExpanded = !isMobileDrawerExpanded;
-    if (isMobileDrawerExpanded) {
-        drawer.style.height = "86vh";
-    } else {
-        drawer.style.height = "52vh";
+function closeActiveSheet() {
+    if (activeSheetId) {
+        const sheet = document.getElementById(`sheet-${activeSheetId}`);
+        const dockBtn = document.getElementById(`dock-btn-${activeSheetId}`);
+        if (sheet) sheet.classList.add('hidden');
+        if (dockBtn) dockBtn.classList.remove('dock-item-active');
+        activeSheetId = null;
     }
-    setTimeout(() => { if (map) map.invalidateSize(); }, 300);
 }
 
 // 6. CANLI OTOBÜS VARIŞ PANOSU MOTORU (BURULAŞ STYLE LIVE ETA BOARD)
@@ -737,7 +741,7 @@ function renderLiveBusDepartureBoard(query = "") {
     filtered.forEach(line => {
         const eta = calculateBusEtaForLine(line.intervalMin || 15);
         const card = document.createElement("div");
-        card.className = "bg-slate-950/90 border border-slate-800/80 hover:border-emerald-500/50 p-3.5 rounded-2xl shadow-lg transition-all duration-200 cursor-pointer flex flex-col gap-2.5 group";
+        card.className = "bg-black/40 hover:bg-black/60 border border-white/10 hover:border-emerald-500/50 p-3.5 rounded-2xl shadow-elite transition-all duration-200 cursor-pointer flex flex-col gap-2.5 group";
         card.setAttribute("data-line-id", line.id);
         card.setAttribute("data-interval", line.intervalMin || 15);
 
@@ -754,19 +758,18 @@ function renderLiveBusDepartureBoard(query = "") {
             statusText = "Durağa Yaklaşıyor";
         }
 
-        // Random realistic speed & occupancy based on line
         const mockSpeed = Math.floor(35 + (line.code.length * 4) % 22);
         const mockOccupancy = Math.floor(30 + (line.intervalMin * 2.5) % 55);
 
         card.innerHTML = `
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-2.5">
-                    <span style="background-color: ${line.color};" class="px-2.5 py-1 rounded-xl font-mono font-black text-white text-xs shadow-md">
+                    <span style="background-color: ${line.color};" class="px-2.5 py-1 rounded-xl font-mono font-black text-white text-xs shadow-glow-emerald">
                         ${line.code}
                     </span>
                     <div>
-                        <h4 class="text-xs font-bold text-white leading-tight group-hover:text-emerald-400 transition">${line.name}</h4>
-                        <span class="text-[10px] text-slate-400 font-medium">${line.type} • ${line.frequency}</span>
+                        <h4 class="text-xs font-black text-white leading-tight group-hover:text-emerald-400 transition">${line.name}</h4>
+                        <span class="text-[10px] text-slate-400 font-mono">${line.type} • ${line.frequency}</span>
                     </div>
                 </div>
                 <div class="text-right flex flex-col items-end">
@@ -777,7 +780,7 @@ function renderLiveBusDepartureBoard(query = "") {
                 </div>
             </div>
 
-            <div class="flex items-center justify-between pt-1.5 border-t border-slate-800/80 text-[10px]">
+            <div class="flex items-center justify-between pt-1.5 border-t border-white/5 text-[10px]">
                 <div class="flex items-center gap-1.5 ${badgeClass} px-2 py-0.5 rounded-lg font-mono font-semibold">
                     <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>
                     <span>${statusText}</span>
@@ -807,11 +810,20 @@ function filterBusDepartureBoard() {
 
 function startClockAndDepartureTicker() {
     setInterval(() => {
-        // Update Board Digital Clock
-        const clock = document.getElementById("live-board-clock");
-        if (clock) {
-            const now = new Date();
-            clock.textContent = now.toLocaleTimeString('tr-TR');
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('tr-TR');
+
+        // Update Top Dynamic Island Clock
+        const eliteClock = document.getElementById("elite-clock");
+        if (eliteClock) eliteClock.textContent = timeStr;
+
+        // Tick Dynamic Island Route Ticker
+        const ticker = document.getElementById("dynamic-island-ticker");
+        if (ticker) {
+            const eta5g = calculateBusEtaForLine(20);
+            const eta1m = calculateBusEtaForLine(12);
+            const eta38 = calculateBusEtaForLine(8);
+            ticker.innerHTML = `<span class="text-emerald-400 font-bold">5/G</span> ${eta5g.mins} dk • <span class="text-sky-400 font-bold">1/M</span> ${eta1m.mins} dk • <span class="text-purple-400 font-bold">38</span> ${eta38.mins} dk`;
         }
 
         // Tick ETA countdowns
@@ -822,7 +834,7 @@ function startClockAndDepartureTicker() {
 
             const eta = calculateBusEtaForLine(line.intervalMin || 15);
             if (eta.mins === 0) {
-                el.innerHTML = `<span class="text-emerald-300 animate-pulse font-black">GİRİŞ YAPIYOR (${eta.secs}s)</span>`;
+                el.innerHTML = `<span class="text-emerald-300 animate-pulse font-black font-mono">GİRİŞ YAPIYOR (${eta.secs}s)</span>`;
             } else {
                 el.textContent = `${eta.mins} dk ${eta.secs}s`;
             }
@@ -847,14 +859,14 @@ function renderPlacesList(filterQuery = "") {
     filtered.forEach(place => {
         const distKm = calculateDistance(userCoords.lat, userCoords.lng, place.lat, place.lng);
         const card = document.createElement("div");
-        card.className = "bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-200/80 dark:border-slate-700/60 p-3.5 shadow-sm hover:shadow-md transition-all space-y-2.5";
+        card.className = "bg-black/40 hover:bg-black/60 border border-white/10 hover:border-amber-500/40 p-3.5 rounded-2xl shadow-elite transition-all duration-200 space-y-2.5 group";
         
         let chainHtml = "";
         if (place.transitChain) {
-            chainHtml = '<div class="flex items-center gap-1 overflow-x-auto py-1 custom-scrollbar text-[10px]">';
+            chainHtml = '<div class="flex items-center gap-1 overflow-x-auto py-1 custom-scrollbar text-[10px] font-mono">';
             place.transitChain.forEach((st, i) => {
-                chainHtml += `<span class="px-2 py-0.5 rounded-lg ${st.color || 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200'} whitespace-nowrap font-semibold">${st.badge ? `<b class="mr-1 font-mono">${st.badge}</b>` : ''}${st.text}</span>`;
-                if (i < place.transitChain.length - 1) chainHtml += `<i class="fa-solid fa-angle-right text-slate-300 dark:text-slate-600 text-[9px]"></i>`;
+                chainHtml += `<span class="px-2 py-0.5 rounded-lg ${st.color || 'bg-white/10 text-white'} whitespace-nowrap font-semibold">${st.badge ? `<b class="mr-1">${st.badge}</b>` : ''}${st.text}</span>`;
+                if (i < place.transitChain.length - 1) chainHtml += `<i class="fa-solid fa-angle-right text-slate-500 text-[9px]"></i>`;
             });
             chainHtml += '</div>';
         }
@@ -864,24 +876,24 @@ function renderPlacesList(filterQuery = "") {
                 <div class="flex items-center space-x-2.5">
                     <span class="text-2xl">${place.icon}</span>
                     <div>
-                        <h4 class="text-xs font-black text-slate-900 dark:text-white leading-tight">${place.name}</h4>
-                        <div class="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
-                            <span>${place.categoryName}</span>
+                        <h4 class="text-xs font-black text-white leading-tight group-hover:text-amber-400 transition">${place.name}</h4>
+                        <div class="flex items-center gap-1.5 text-[10px] text-slate-400 font-mono mt-0.5">
+                            <span class="text-amber-400/90 uppercase font-semibold">${place.categoryName}</span>
                             <span>•</span>
-                            <span class="text-emerald-600 dark:text-emerald-400 font-bold font-mono">${distKm.toFixed(1)} km yakınınızda</span>
+                            <span class="text-emerald-400 font-bold font-mono">${distKm.toFixed(1)} km mesafede</span>
                         </div>
                     </div>
                 </div>
-                <span class="bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full font-mono border border-blue-200 dark:border-blue-800/60">${place.busCode || 'Ulaşım'}</span>
+                <span class="bg-white/5 border border-white/10 text-cyan-300 text-[10px] font-bold px-2 py-0.5 rounded-full font-mono">${place.busCode || 'Ulaşım'}</span>
             </div>
-            <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-2">${place.desc}</p>
+            <p class="text-[11px] text-slate-300 leading-relaxed line-clamp-2">${place.desc}</p>
             ${chainHtml}
-            <div class="flex gap-2 pt-1 border-t border-slate-100 dark:border-slate-700/60">
-                <button onclick="setDestinationAndRoute('${place.id}')" class="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white py-2 rounded-xl text-xs font-bold shadow-md shadow-emerald-500/20 flex items-center justify-center gap-1.5 transition active:scale-95">
+            <div class="flex gap-2 pt-1 border-t border-white/5">
+                <button onclick="setDestinationAndRoute('${place.id}')" class="flex-1 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white py-2 rounded-xl text-xs font-black font-mono shadow-glow-emerald flex items-center justify-center gap-1.5 transition active:scale-95">
                     <i class="fa-solid fa-diamond-turn-right"></i> Rota Çiz
                 </button>
-                <button onclick="focusPlaceOnMap('${place.id}')" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition">
-                    <i class="fa-solid fa-location-dot text-blue-600 dark:text-blue-400"></i>
+                <button onclick="focusPlaceOnMap('${place.id}')" class="bg-white/5 hover:bg-white/15 text-slate-300 px-3 py-2 rounded-xl text-xs font-bold border border-white/10 transition">
+                    <i class="fa-solid fa-location-dot text-emerald-400"></i>
                 </button>
             </div>
         `;
@@ -898,11 +910,9 @@ function setCategory(cat) {
     currentCategory = cat;
     document.querySelectorAll(".cat-filter-btn").forEach(btn => {
         if (btn.getAttribute("data-cat") === cat) {
-            btn.classList.add("active-cat", "bg-slate-900", "text-white");
-            btn.classList.remove("bg-white", "text-slate-700");
+            btn.className = "cat-filter-btn active-cat px-3 py-1 rounded-full font-bold whitespace-nowrap bg-emerald-500 text-slate-950 shadow-glow-emerald";
         } else {
-            btn.classList.remove("active-cat", "bg-slate-900", "text-white");
-            btn.classList.add("bg-white", "text-slate-700");
+            btn.className = "cat-filter-btn px-3 py-1 rounded-full font-semibold whitespace-nowrap bg-white/5 text-slate-300 border border-white/10 hover:border-amber-400";
         }
     });
     filterPlaces();
@@ -933,7 +943,7 @@ function closeFloatingPlaceCard() {
 function routeToSelectedPlace() {
     closeFloatingPlaceCard();
     calculateCustomABRoute();
-    switchAppTab('ab-route');
+    toggleSheet('ab-route');
 }
 
 // 8. GERÇEK YÜKSEK HASSASİYETLİ MOBİL GPS MOTORU (AKILLI HATA YÖNETİMİ)
@@ -1268,7 +1278,7 @@ function setPointAToUserGPS() {
 function setDestinationAndRoute(placeId) {
     document.getElementById("select-point-b").value = placeId;
     calculateCustomABRoute();
-    switchAppTab('ab-route');
+    toggleSheet('ab-route');
 }
 
 function setTravelMode(mode) {
@@ -1277,9 +1287,9 @@ function setTravelMode(mode) {
         const btn = document.getElementById(`mode-btn-${m}`);
         if (btn) {
             if (m === mode) {
-                btn.className = "flex-1 py-1.5 rounded-lg font-bold bg-slate-900 text-white shadow flex items-center justify-center gap-1";
+                btn.className = "py-2 rounded-xl font-bold bg-emerald-600 text-white shadow-glow-emerald flex items-center justify-center gap-1.5 transition";
             } else {
-                btn.className = "flex-1 py-1.5 rounded-lg font-semibold bg-slate-100 text-slate-700 flex items-center justify-center gap-1";
+                btn.className = "py-2 rounded-xl font-semibold bg-white/5 hover:bg-white/10 text-slate-300 flex items-center justify-center gap-1.5 border border-white/10 transition";
             }
         }
     });
